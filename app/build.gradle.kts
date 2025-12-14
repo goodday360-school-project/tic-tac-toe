@@ -3,15 +3,24 @@
  */
 
 plugins {
+    application
     id("buildlogic.java-application-conventions")
 }
+
 
 dependencies {
     implementation("org.apache.commons:commons-text")
     implementation(project(":utilities"))
+    implementation("mysql:mysql-connector-java:8.0.25")
 }
 
 application {
     // Define the main class for the application.
-    mainClass = "org.example.app.App"
+    mainClass.set("org.tictactoe.app.App")
+}
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = application.mainClass.get()
+    }
 }
