@@ -25,17 +25,38 @@ public class Playground {
     JFrame frame = new JFrame();
     JButton[][] board = new JButton[5][5];
 
-    String current_turn = "x";
-    JLabel current_turn_label = new JLabel("- Turn: "+current_turn.toUpperCase());
-    String player_turn =  "x"; // Utils.shuffleArray(new String[] {"x", "o"})[0];
-    JLabel player_turn_label = new JLabel("- Player: "+player_turn.toUpperCase());
+    private String current_turn = "x";
+    private final JLabel current_turn_label = new JLabel("- Turn: "+current_turn.toUpperCase());
+    private String player_turn = "";
+    private final JLabel player_turn_label = new JLabel("- Player: "+player_turn.toUpperCase());
 
     /* Played Move */
-    int x_played_move_count = 0;
-    JLabel x_played_move_label = new JLabel("  X: 0");
-    int o_played_move_count = 0;
-    JLabel o_played_move_label = new JLabel("  O: 0");
+    private int x_played_move_count = 0;
+    private final JLabel x_played_move_label = new JLabel("  X: 0");
+    private int o_played_move_count = 0;
+    private final JLabel o_played_move_label = new JLabel("  O: 0");
     /* --- */
+
+    public Playground() {
+        this.player_turn = "x"; // Utils.shuffleArray(new String[] {"x", "o"})[0];
+
+        /* Styling `frame` */
+        frame.setSize(width, height);
+        frame.setLocationRelativeTo(null);
+        frame.setResizable(false);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
+        frame.getContentPane().setBackground(new Color(87,72,82));
+        /* --- */
+        
+        /* Setup UI Container */
+        SetupStatusContainer();
+        SetupBoardContainer();
+        /* --- */
+        
+        frame.pack();
+        frame.setVisible(true);
+    }
 
     public String getCurrentTurn() {
         return this.current_turn;
@@ -57,13 +78,13 @@ public class Playground {
         }
     }
 
-    private void SetupWestContainer() {
-        JPanel westContainer = new JPanel();
-        westContainer.setOpaque(false);
-        westContainer.setBackground(null);
-        westContainer.setBorder(new EmptyBorder(75, 25, 0, 25));
-        westContainer.setLayout(new BorderLayout());
-        frame.add(westContainer);
+    private void SetupStatusContainer() {
+        JPanel statusContainer = new JPanel();
+        statusContainer.setOpaque(false);
+        statusContainer.setBackground(null);
+        statusContainer.setBorder(new EmptyBorder(75, 25, 0, 25));
+        statusContainer.setLayout(new BorderLayout());
+        frame.add(statusContainer);
 
         /* Setup Game Status UI */
         // ==> Load Top Panel Image into Panel
@@ -84,7 +105,7 @@ public class Playground {
         status_panel.setPreferredSize(new Dimension(panel_width, panel_height));
         status_panel.setLayout(new BoxLayout(status_panel, BoxLayout.Y_AXIS));
         status_panel.setBorder(new EmptyBorder(25, 25, 25, 25));
-        westContainer.add(status_panel, BorderLayout.CENTER);
+        statusContainer.add(status_panel, BorderLayout.CENTER);
 
         // <===
         // ===> Add Text to Status Panel
@@ -235,20 +256,5 @@ public class Playground {
 
     }
 
-    public Playground() {
-        /* Styling `frame` */
-        frame.setSize(width, height);
-        frame.setLocationRelativeTo(null);
-        frame.setResizable(false);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
-        frame.getContentPane().setBackground(new Color(87,72,82));
-        /* --- */
-        SetupWestContainer();
-        SetupBoardContainer();
 
-        /* --- */
-        frame.pack();
-        frame.setVisible(true);
-    }
 }
