@@ -1,6 +1,6 @@
 package org.tictactoe.app.playground;
 
-import java.util.Objects;
+import java.util.*;
 import java.io.*;
 
 /* awt Imports */
@@ -15,14 +15,21 @@ import javax.swing.border.*;
 
 /* Custom Package Imports */
 import org.tictactoe.app.utils.Utils;
+import org.tictactoe.app.playground.Bot;
 /* --- */
 
 
 public class Playground {
+    PlaygroundUtils playgroundUtils = new PlaygroundUtils(this);
+
     int width = 1000;
     int height = 650;
+    public boolean isWorking = false;
+    public boolean gameEnd = false;
 
-    JFrame frame = new JFrame();
+    private final Bot bot;
+
+    private final JFrame frame = new JFrame();
     JButton[][] board = new JButton[5][5];
 
     private String current_turn = "x";
@@ -38,7 +45,11 @@ public class Playground {
     /* --- */
 
     public Playground() {
+        /* Initialize Player & Bot */
         this.player_turn = "x"; // Utils.shuffleArray(new String[] {"x", "o"})[0];
+        this.bot = new Bot(0,this);
+        /* --- */
+
 
         /* Styling `frame` */
         frame.setSize(width, height);
@@ -58,13 +69,22 @@ public class Playground {
         frame.setVisible(true);
     }
 
+    public String getPlayerTurn() {
+        return this.player_turn;
+    }
+
     public String getCurrentTurn() {
         return this.current_turn;
     }
 
-    public void setCurrentTurn(String turn) {
-        this.current_turn = turn;
-        this.current_turn_label.setText("- Turn: " + turn.toUpperCase());
+
+    public void switchCurrentTurn() {
+        if (this.current_turn.trim().equalsIgnoreCase("x")){
+            this.current_turn = "o";
+        }else{
+            this.current_turn = "x";
+        }
+        this.current_turn_label.setText("- Turn: " + this.current_turn.toUpperCase());
     }
 
 
@@ -77,6 +97,8 @@ public class Playground {
             o_played_move_label.setText("  O: "+o_played_move_count);
         }
     }
+
+    /* Set UI */
 
     private void SetupStatusContainer() {
         JPanel statusContainer = new JPanel();
@@ -201,34 +223,44 @@ public class Playground {
                 tile.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
                 // ===> Hover Effect
+                final int finalR = r;
+                final int finalC = c;
                 tile.addMouseListener(new java.awt.event.MouseAdapter() {
                     @Override
                     public void mouseEntered(MouseEvent e) {
+                        if (!tile.getText().trim().isEmpty() || gameEnd || isWorking){
+                            return;
+                        }
                         tile.setBackground(new Color(171,155,142));
                     }
 
                     @Override
                     public void mouseExited(MouseEvent e) {
+                        if (!tile.getText().trim().isEmpty()  || gameEnd || isWorking){
+                            return;
+                        }
                         tile.setBackground(new Color(87,72,82));
                     }
 
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        System.out.println(current_turn +" "+ player_turn);
-                        if (!tile.getText().trim().isEmpty()) {
+                        if (!tile.getText().trim().isEmpty() || isWorking || gameEnd) {
                             System.out.println("NOT EMPTY");
                             return;
                         }
+                        isWorking = true;
 
                         if (current_turn.equals(player_turn)){
                             tile.setText(player_turn);
-                            setCurrentTurn(player_turn.equals("x") ? "o" : "x");
+                        }else{
+                            return;
                         }
+                        tile.setBackground(new Color(87,72,82));
                         // Testing need to remove after added bot
-                        else{
-                            tile.setText(player_turn.equals("x") ? "o" : "x");
-                            setCurrentTurn(player_turn);
-                        }
+//                        else{
+//                            tile.setText(player_turn.equals("x") ? "o" : "x");
+//                            switchCurrentTurn();
+//                        }
                         // !-----
 
                         // ===> Apply New Text Color After Player Played Move
@@ -243,7 +275,11 @@ public class Playground {
                         incrementPlayedMoveCount(tile.getText());
                         // <===
 
-                        System.out.println(tile.getText());
+                        // ===> Give Turn To Bot
+                        playgroundUtils.checkGameResult(finalR, finalC);
+                        switchCurrentTurn();
+                        bot.play();
+                        // <===
                     }
                 });
                 // <===
@@ -256,5 +292,133 @@ public class Playground {
 
     }
 
-
+    /* --- */
 }
+
+class PlaygroundUtils {
+    private final Playground playground;
+    public PlaygroundUtils(Playground playground){
+        this.playground = playground;
+    }
+
+    public int[] getNextPosition(int current_r, int current_c, String direction) {
+        int new_r = current_r;
+        int new_c = current_c;
+
+        switch (direction.trim().toLowerCase()) {
+            case "n":   // North
+                new_r -= 1;
+                break;
+            case "s":   // South
+                new_r += 1;
+                break;
+            case "e":   // East
+                new_c += 1;
+                break;
+            case "w":   // West
+                new_c -= 1;
+                break;
+            case "ne":  // North-East
+                new_r -= 1;
+                new_c += 1;
+                break;
+            case "nw":  // North-West
+                new_r -= 1;
+                new_c -= 1;
+                break;
+            case "se":  // South-East
+                new_r += 1;
+                new_c += 1;
+                break;
+            case "sw":  // South-West
+                new_r += 1;
+                new_c -= 1;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid direction: " + direction +
+                        ". Must be one of: n, s, e, w, ne, nw, se, sw");
+        }
+
+        // Boundary check (assuming 5x5 grid)
+        if (new_r >= 5 || new_c >= 5 || new_r < 0 || new_c < 0) {
+            return null;
+        }
+
+        return new int[]{new_r, new_c};
+    }
+
+
+    public void checkGameResult(int r, int c) {
+        System.out.println("It run with RC: "+r+c);
+        JButton[][] board = playground.board;
+        String current_position_turn = board[r][c].getText().trim();
+
+
+        /* Check Matched Direction */
+        //      NW  N  NE
+        //      W - | - E
+        //      SW  S  SE
+
+        // ===> N
+        String[][] paired_directions = {
+                {"n", "s"},
+                {"e", "w"},
+                {"ne", "sw"},
+                {"nw", "se"},
+
+        };
+
+        for (String[] p_direction: paired_directions) {
+            ArrayList<Integer[]> checked_direction_positions = new ArrayList<>();
+            int matched_score = 1; //-> score start with 1 because current pos already matched.
+
+            for (String direction: p_direction) {
+                int[] current_checking_position = {r, c};
+
+                while (true) {
+                    System.out.println("Score: " + matched_score);
+
+                    if (matched_score == 3) {
+                        break;
+                    }
+
+                    int[] next_position = this.getNextPosition(current_checking_position[0], current_checking_position[1], direction);
+
+                    if (next_position == null) {
+                        break;
+                    }
+                    System.out.println("Next position:"+ next_position[0]+ next_position[1]);
+
+                    String next_position_turn = board[next_position[0]][next_position[1]].getText().trim();
+
+                    if (next_position_turn.equalsIgnoreCase(current_position_turn)) {
+                        matched_score++;
+                        checked_direction_positions.add(new Integer[]{next_position[0], next_position[1]});
+                        current_checking_position = next_position;
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            if (matched_score == 3){
+                this.playground.gameEnd = true;
+                System.out.println("Win Matched Direction: " + p_direction[0]+ " " + p_direction[1]);
+                for (Integer[] position: checked_direction_positions){
+                    board[r][c].setBackground(new Color(255,0,0));
+                    board[position[0]][position[1]].setBackground(new Color(255,0,0));
+                }
+
+                break;
+            }
+
+        }
+        System.out.println("====");
+        // <===
+
+        /* --- */
+
+
+    }
+}
+
