@@ -1,7 +1,5 @@
 package org.tictactoe.app.playground;
 
-import org.tictactoe.app.playground.Playground;
-
 /* Java Swing Import */
 import javax.swing.*;
 
@@ -23,7 +21,7 @@ public class Bot {
 
     private void easy_bot(){
         JButton[][] board = playground.board;
-        ArrayList<Integer[]> available_move = new ArrayList<Integer[]>();
+        ArrayList<Integer[]> available_move = new ArrayList<>();
         for (int r = 0; r < 5; r++){
             for (int c = 0; c < 5; c++) {
                 if (board[r][c].getText().trim().equalsIgnoreCase("")){

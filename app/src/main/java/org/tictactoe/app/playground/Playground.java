@@ -1,7 +1,7 @@
 package org.tictactoe.app.playground;
 
+
 import java.util.*;
-import java.io.*;
 
 /* awt Imports */
 import java.awt.*;
@@ -15,7 +15,6 @@ import javax.swing.border.*;
 
 /* Custom Package Imports */
 import org.tictactoe.app.utils.Utils;
-import org.tictactoe.app.playground.Bot;
 /* --- */
 
 
@@ -33,9 +32,9 @@ public class Playground {
     JButton[][] board = new JButton[5][5];
 
     private String current_turn = "x";
-    private final JLabel current_turn_label = new JLabel("- Turn: "+current_turn.toUpperCase());
-    private String player_turn = "";
-    private final JLabel player_turn_label = new JLabel("- Player: "+player_turn.toUpperCase());
+    private final JLabel current_turn_label = new JLabel("- Turn: ");
+    private String player_turn = null;
+    private final JLabel player_turn_label = new JLabel("- Player: ");
 
     /* Played Move */
     private int x_played_move_count = 0;
@@ -47,6 +46,7 @@ public class Playground {
     public Playground() {
         /* Initialize Player & Bot */
         this.player_turn = "x"; // Utils.shuffleArray(new String[] {"x", "o"})[0];
+        this.player_turn_label.setText("- Player: "+this.player_turn.toUpperCase());
         this.bot = new Bot(0,this);
         /* --- */
 
@@ -71,10 +71,6 @@ public class Playground {
 
     public String getPlayerTurn() {
         return this.player_turn;
-    }
-
-    public String getCurrentTurn() {
-        return this.current_turn;
     }
 
 
@@ -134,7 +130,7 @@ public class Playground {
 
         JLabel title = new JLabel("STATUS");
         title.setFont(Utils.getFont(28f));
-        title.setMaximumSize(new Dimension(panel_width, 50));;
+        title.setMaximumSize(new Dimension(panel_width, 50));
         title.setForeground(Color.WHITE);
         title.setBackground(null);
         title.setOpaque(false);
@@ -142,29 +138,29 @@ public class Playground {
         title.setVerticalAlignment(SwingConstants.CENTER);
         status_panel.add(title);
 
-        current_turn_label.setMaximumSize(new Dimension(panel_width, 25));;
+        current_turn_label.setMaximumSize(new Dimension(panel_width, 25));
         current_turn_label.setForeground(Color.WHITE);
         current_turn_label.setFont(Utils.getFont(20f));
         status_panel.add(current_turn_label);
 
-        player_turn_label.setMaximumSize(new Dimension(panel_width, 25));;
+        player_turn_label.setMaximumSize(new Dimension(panel_width, 25));
         player_turn_label.setForeground(Color.WHITE);
         player_turn_label.setFont(Utils.getFont(20f));
         status_panel.add(player_turn_label);
 
         JLabel label2 = new JLabel("- Played Move");
-        label2.setMaximumSize(new Dimension(panel_width, 25));;
+        label2.setMaximumSize(new Dimension(panel_width, 25));
         label2.setForeground(Color.WHITE);
         label2.setFont(Utils.getFont(20f));
         status_panel.add(label2);
 
 
-        x_played_move_label.setMaximumSize(new Dimension(panel_width, 25));;
+        x_played_move_label.setMaximumSize(new Dimension(panel_width, 25));
         x_played_move_label.setForeground(Color.WHITE);
         x_played_move_label.setFont(Utils.getFont(20f));
         status_panel.add(x_played_move_label);
 
-        o_played_move_label.setMaximumSize(new Dimension(panel_width, 25));;
+        o_played_move_label.setMaximumSize(new Dimension(panel_width, 25));
         o_played_move_label.setForeground(Color.WHITE);
         o_played_move_label.setFont(Utils.getFont(20f));
         status_panel.add(o_played_move_label);
@@ -175,8 +171,6 @@ public class Playground {
     }
 
     private void SetupBoardContainer() {
-
-
         /* Setup Board Container & Board */
         JPanel boardContainer = new JPanel();
         boardContainer.setLayout(new BorderLayout());
