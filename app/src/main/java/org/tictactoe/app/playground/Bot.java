@@ -67,29 +67,30 @@ public class Bot {
         this.playground.playgroundUtils.checkGameResult(available_move.getFirst()[0], available_move.getFirst()[1]);
     }
 
-    private Callable<Integer> hardBotTask(int current_r, int current_c) {
+    private Callable<Integer[]> hardBotTask(int current_r, int current_c) {
         return () -> {
 
-
-            return 1;
+            return new Integer[] {1, 1}; // {Min, Max}
         };
     };
 
     private void hard_bot(){
-        ArrayList<Callable<Integer>> task_list = new ArrayList<>();
+        ArrayList<Callable<Integer[]>> task_list = new ArrayList<>();
+
         for (int r = 0; r < 5; r++){
             for (int c = 0; c < 5; c++) {
-                Callable<Integer> new_task = this.hardBotTask(0,0);
+                Callable<Integer[]> new_task = this.hardBotTask(0,0);
                 task_list.add(new_task);
             }
         }
+
         try {
             // Run all tasks and wait for them to finish
-            List<Future<Integer>> results = executor.invokeAll(task_list);
+            List<Future<Integer[]>> results = executor.invokeAll(task_list);
 
-            for (Future<Integer> future : results) {
-                Integer score = future.get();
-                System.out.println(score);
+            for (Future<Integer[]> future : results) {
+                Integer[] score = future.get();
+                System.out.println(score[0]+ score[1]);
             }
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
