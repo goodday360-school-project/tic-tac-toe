@@ -28,12 +28,13 @@ public class Playground {
 
     private final Bot bot;
 
-    private final JFrame frame = new JFrame();
+    private final JFrame mainFrame;
+
     JButton[][] board = new JButton[5][5];
 
     private String current_turn = "x";
-    private final JLabel current_turn_label = new JLabel("- Turn: ");
-    private String player_turn = null;
+    private final JLabel current_turn_label = new JLabel("- Turn: " + this.current_turn);
+    private final String player_turn;
     private final JLabel player_turn_label = new JLabel("- Player: ");
 
     /* Played Move */
@@ -43,30 +44,32 @@ public class Playground {
     private final JLabel o_played_move_label = new JLabel("  O: 0");
     /* --- */
 
-    public Playground() {
+    public Playground(JFrame mainFrame) {
+        this.mainFrame = mainFrame;
+
         /* Initialize Player & Bot */
         this.player_turn = "x"; // Utils.shuffleArray(new String[] {"x", "o"})[0];
         this.player_turn_label.setText("- Player: "+this.player_turn.toUpperCase());
-        this.bot = new Bot(0,this);
+        this.bot = new Bot(1,this);
         /* --- */
 
 
-        /* Styling `frame` */
-        frame.setSize(width, height);
-        frame.setLocationRelativeTo(null);
-        frame.setResizable(false);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.X_AXIS));
-        frame.getContentPane().setBackground(new Color(87,72,82));
+        /* Styling `mainFrame` */
+        this.mainFrame.setSize(width, height);
+        this.mainFrame.setLocationRelativeTo(null);
+        this.mainFrame.setResizable(false);
+        this.mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.mainFrame.setLayout(new BoxLayout(mainFrame.getContentPane(), BoxLayout.X_AXIS));
+        this.mainFrame.getContentPane().setBackground(new Color(87,72,82));
         /* --- */
-        
+
         /* Setup UI Container */
         SetupStatusContainer();
         SetupBoardContainer();
         /* --- */
-        
-        frame.pack();
-        frame.setVisible(true);
+
+        mainFrame.pack();
+        mainFrame.setVisible(true);
     }
 
     public String getPlayerTurn() {
@@ -102,7 +105,7 @@ public class Playground {
         statusContainer.setBackground(null);
         statusContainer.setBorder(new EmptyBorder(75, 25, 0, 25));
         statusContainer.setLayout(new BorderLayout());
-        frame.add(statusContainer);
+        this.mainFrame.add(statusContainer);
 
         /* Setup Game Status UI */
         // ==> Load Top Panel Image into Panel
@@ -176,7 +179,7 @@ public class Playground {
         boardContainer.setLayout(new BorderLayout());
         boardContainer.setOpaque(false);
         boardContainer.setBackground(null);
-        frame.add(boardContainer);
+        mainFrame.add(boardContainer);
 
         // ==> Load Top Pattern Image
         ImageIcon icon = new ImageIcon(
@@ -272,7 +275,10 @@ public class Playground {
                         // ===> Give Turn To Bot
                         playgroundUtils.checkGameResult(finalR, finalC);
                         switchCurrentTurn();
-                        bot.play();
+
+                        Thread t = new Thread(bot::play);
+                        t.setDaemon(false);
+                        t.start();
                         // <===
                     }
                 });

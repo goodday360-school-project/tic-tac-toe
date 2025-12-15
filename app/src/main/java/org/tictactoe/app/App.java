@@ -4,14 +4,17 @@ package org.tictactoe.app;
 
 /* Custom Package Imports */
 import org.tictactoe.app.playground.Playground;
+
+import javax.swing.*;
 /* --- */
 
 
 public class App {
 
-    public static void main(String[] args) {
+    private static final JFrame mainFrame = new JFrame();
 
-        Playground playground = new Playground();
+    public static void main(String[] args) {
+        Playground playground = new Playground(mainFrame);
 
     }
 }
