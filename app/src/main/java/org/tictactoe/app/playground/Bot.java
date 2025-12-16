@@ -68,12 +68,12 @@ public class Bot {
             String bot_turn = this.playground.getPlayerTurn().equalsIgnoreCase("x") ? "o" : "x";
             Collections.shuffle(available_move);
 
-            board[available_move.getFirst()[0]][available_move.getFirst()[1]].setText(bot_turn.toUpperCase());
+            board[available_move.get(0)[0]][available_move.get(0)[1]].setText(bot_turn.toUpperCase());
             this.playground.incrementPlayedMoveCount(bot_turn);
             this.playground.switchCurrentTurn();
         }
 
-        this.playground.gameEvent.checkGameResult(available_move.getFirst()[0], available_move.getFirst()[1]);
+        this.playground.gameEvent.checkGameResult(available_move.get(0)[0], available_move.get(0)[1]);
     }
 
     private Callable<TaskResult> hardBotTask(int r, int c) {
@@ -264,7 +264,7 @@ public class Bot {
                 }
                 if (!available_move.isEmpty()) {
                     Collections.shuffle(available_move);
-                    play_position = new int[]{available_move.getFirst()[0], available_move.getFirst()[1]};
+                    play_position = new int[]{available_move.get(0)[0], available_move.get(0)[1]};
                 }
                 // <===
             }

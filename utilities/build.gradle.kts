@@ -9,3 +9,10 @@ plugins {
 dependencies {
     api(project(":list"))
 }
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+

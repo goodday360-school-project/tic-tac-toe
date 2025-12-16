@@ -5,3 +5,9 @@
 plugins {
     id("buildlogic.java-library-conventions")
 }
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
