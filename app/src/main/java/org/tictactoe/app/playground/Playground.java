@@ -19,42 +19,38 @@ import org.tictactoe.app.utils.Utils;
 
 
 public class Playground {
-    PlaygroundUtils playgroundUtils = new PlaygroundUtils(this);
+    GameEvent gameEvent = new GameEvent(this);
 
     int width = 1000;
     int height = 650;
+
+    public final int maxMatchToWin = 4;
+
     public boolean isWorking = false;
     public boolean gameEnd = false;
 
-    private final Bot bot;
+    public final Bot bot;
 
     private final JFrame mainFrame;
 
     JButton[][] board = new JButton[5][5];
 
     private String current_turn = "x";
-    private final JLabel current_turn_label = new JLabel("- Turn: " + this.current_turn);
+    private final JLabel current_turn_label = new JLabel("- Turn: " + this.current_turn.toUpperCase());
     private final String player_turn;
     private final JLabel player_turn_label = new JLabel("- Player: ");
 
     /* Played Move */
-    private int x_played_move_count = 0;
+    public int x_played_move_count = 0;
     private final JLabel x_played_move_label = new JLabel("  X: 0");
-    private int o_played_move_count = 0;
+    public int o_played_move_count = 0;
     private final JLabel o_played_move_label = new JLabel("  O: 0");
     /* --- */
 
-    public Playground(JFrame mainFrame) {
-        this.mainFrame = mainFrame;
-
-        /* Initialize Player & Bot */
-        this.player_turn = "x"; // Utils.shuffleArray(new String[] {"x", "o"})[0];
-        this.player_turn_label.setText("- Player: "+this.player_turn.toUpperCase());
-        this.bot = new Bot(1,this);
-        /* --- */
-
+    public Playground(JFrame mainFrame, int difficulty) {
 
         /* Styling `mainFrame` */
+        this.mainFrame = mainFrame;
         this.mainFrame.setSize(width, height);
         this.mainFrame.setLocationRelativeTo(null);
         this.mainFrame.setResizable(false);
@@ -70,6 +66,20 @@ public class Playground {
 
         mainFrame.pack();
         mainFrame.setVisible(true);
+
+        /* Initialize Bot */
+        this.player_turn = Utils.shuffleArray(new String[]{"x","o"})[0];
+        this.player_turn_label.setText("- Player: "+player_turn.toUpperCase());
+        this.bot = new Bot(difficulty,this);
+        if (!current_turn.equalsIgnoreCase(player_turn)) {
+            this.bot.play();
+        }
+        /* --- */
+        
+    }
+
+    public String getCurrentTurn(){
+        return this.current_turn;
     }
 
     public String getPlayerTurn() {
@@ -78,6 +88,7 @@ public class Playground {
 
 
     public void switchCurrentTurn() {
+        System.out.println("Switching Turn From: " + this.current_turn);
         if (this.current_turn.trim().equalsIgnoreCase("x")){
             this.current_turn = "o";
         }else{
@@ -97,8 +108,28 @@ public class Playground {
         }
     }
 
-    /* Set UI */
+    public void playMove(int r, int c, String turn){
+        // ===> Apply New Text Color After Played Move
+        JButton tile = board[r][c];
+        tile.setBackground(new Color(87,72,82));
+        tile.setText(turn.toUpperCase());
+        if (tile.getText().trim().equalsIgnoreCase("x")){
+            tile.setForeground(new Color(254,137,9));
+        }else{
+            tile.setForeground(new Color(0,220,255));
+        }
+        // <===
 
+        // ===> Increment Turn Played Move Count
+        this.incrementPlayedMoveCount(tile.getText());
+        // <===
+
+        this.gameEvent.checkGameResult(r, c);
+        this.switchCurrentTurn();
+        System.out.println("Turn: " + this.current_turn);
+    }
+
+    /* Setup UI */
     private void SetupStatusContainer() {
         JPanel statusContainer = new JPanel();
         statusContainer.setOpaque(false);
@@ -241,45 +272,7 @@ public class Playground {
 
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        if (!tile.getText().trim().isEmpty() || isWorking || gameEnd) {
-                            System.out.println("NOT EMPTY");
-                            return;
-                        }
-                        isWorking = true;
-
-                        if (current_turn.equals(player_turn)){
-                            tile.setText(player_turn);
-                        }else{
-                            return;
-                        }
-                        tile.setBackground(new Color(87,72,82));
-                        // Testing need to remove after added bot
-//                        else{
-//                            tile.setText(player_turn.equals("x") ? "o" : "x");
-//                            switchCurrentTurn();
-//                        }
-                        // !-----
-
-                        // ===> Apply New Text Color After Player Played Move
-                        if (tile.getText().trim().equalsIgnoreCase("x")){
-                            tile.setForeground(new Color(254,137,9));
-                        }else{
-                            tile.setForeground(new Color(0,220,255));
-                        }
-                        // <===
-
-                        // ===> Increment Turn Played Move Count
-                        incrementPlayedMoveCount(tile.getText());
-                        // <===
-
-                        // ===> Give Turn To Bot
-                        playgroundUtils.checkGameResult(finalR, finalC);
-                        switchCurrentTurn();
-
-                        Thread t = new Thread(bot::play);
-                        t.setDaemon(false);
-                        t.start();
-                        // <===
+                        gameEvent.playerPlay(finalR, finalC, tile);
                     }
                 });
                 // <===
@@ -295,9 +288,9 @@ public class Playground {
     /* --- */
 }
 
-class PlaygroundUtils {
+class GameEvent {
     private final Playground playground;
-    public PlaygroundUtils(Playground playground){
+    public GameEvent(Playground playground){
         this.playground = playground;
     }
 
@@ -347,6 +340,25 @@ class PlaygroundUtils {
         return new int[]{new_r, new_c};
     }
 
+    public void playerPlay(int current_r, int current_c, JButton tile){
+        if (!tile.getText().trim().isEmpty() || this.playground.isWorking || this.playground.gameEnd) {
+            return;
+        }
+
+        if (this.playground.getCurrentTurn().equals(this.playground.getPlayerTurn())){
+            this.playground.playMove(current_r, current_c, this.playground.getPlayerTurn());
+        }else{
+            return;
+        }
+
+        this.playground.isWorking = true;
+
+        // ===> Give Turn To Bot
+        Thread t = new Thread(this.playground.bot::play);
+        t.setDaemon(false);
+        t.start();
+        // <===
+    }
 
     public void checkGameResult(int r, int c) {
         System.out.println("It run with RC: "+r+c);
@@ -359,7 +371,6 @@ class PlaygroundUtils {
         //      W - | - E
         //      SW  S  SE
 
-        // ===> N
         String[][] paired_directions = {
                 {"n", "s"},
                 {"e", "w"},
@@ -378,7 +389,7 @@ class PlaygroundUtils {
                 while (true) {
                     System.out.println("Score: " + matched_score);
 
-                    if (matched_score == 3) {
+                    if (matched_score == this.playground.maxMatchToWin) {
                         break;
                     }
 
@@ -401,7 +412,7 @@ class PlaygroundUtils {
                 }
             }
 
-            if (matched_score == 3){
+            if (matched_score == this.playground.maxMatchToWin){
                 this.playground.gameEnd = true;
                 System.out.println("Win Matched Direction: " + p_direction[0]+ " " + p_direction[1]);
                 for (Integer[] position: checked_direction_positions){
@@ -414,7 +425,6 @@ class PlaygroundUtils {
 
         }
         System.out.println("====");
-        // <===
 
         /* --- */
 
