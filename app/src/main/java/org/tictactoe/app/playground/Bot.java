@@ -86,7 +86,7 @@ public class Bot {
             String bot_turn = player_turn.equalsIgnoreCase("x") ? "o" : "x";
             int min_score = 0, max_score = 0;
 
-            /* Check Matched Direction */
+            /* Check Matched In Pair Direction */
             //      NW  N  NE
             //      W - | - E
             //      SW  S  SE
