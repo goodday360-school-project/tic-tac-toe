@@ -354,9 +354,7 @@ class GameEvent {
         this.playground.isWorking = true;
 
         // ===> Give Turn To Bot
-        Thread t = new Thread(this.playground.bot::play);
-        t.setDaemon(false);
-        t.start();
+        this.playground.bot.play();
         // <===
     }
 

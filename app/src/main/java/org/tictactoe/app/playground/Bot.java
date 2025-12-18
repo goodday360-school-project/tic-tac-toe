@@ -23,7 +23,9 @@ public class Bot {
     private final Playground playground;
     private final int difficulty;
 
-    private static final ExecutorService executor = Executors.newFixedThreadPool(25);
+
+    private static final ExecutorService bot_play_executor = Executors.newFixedThreadPool(1);
+    private static final ExecutorService hard_bot_task_hard_bot_task_executor = Executors.newFixedThreadPool(25);
 
     public Bot(int difficulty, Playground playground){
         this.playground = playground;
@@ -32,7 +34,7 @@ public class Bot {
 
     public void play(){
         this.playground.isWorking = true;
-        {
+        bot_play_executor.execute(()->{
             if (this.playground.gameEnd) {
                 return;
             }
@@ -50,8 +52,8 @@ public class Bot {
 
                 }
             }
-        }
-        this.playground.isWorking = false;
+            this.playground.isWorking = false;
+        });
     }
 
     private void easy_bot(){
@@ -85,6 +87,8 @@ public class Bot {
             String player_turn = this.playground.getPlayerTurn();
             String bot_turn = player_turn.equalsIgnoreCase("x") ? "o" : "x";
             int min_score = 0, max_score = 0;
+            boolean has_strong_min_score = false;
+            int min_outlier_predict_score = 0;
 
             /* Check Matched In Pair Direction */
             //      NW  N  NE
@@ -101,28 +105,27 @@ public class Bot {
             for (String[] p_direction: paired_directions) {
                 int paired_direction_max_score = 0;
                 int paired_direction_min_score = 0;
-                int outlier_predict_score = 0;
 
                 ArrayList<String> paired_direction_as_arraylist = new ArrayList<>(Arrays.asList(p_direction));
                 for (String direction: paired_direction_as_arraylist) {
 
                     int current_direction_min_score = 0;
                     int current_direction_max_score = 0;
-                    int[] current_checking_position = {r, c};
-                    boolean next_position_is_null = false;
+                    int[] last_checking_position = {r, c};
+                    boolean next_position_is_blocked = false;
                     while (true) {
                         if (paired_direction_max_score == (this.playground.maxMatchToWin - 1)) {
                             break;
                         }
 
-                        int[] next_position = this.playground.gameEvent.getNextPosition(current_checking_position[0], current_checking_position[1], direction);
+                        int[] next_position = this.playground.gameEvent.getNextPosition(last_checking_position[0], last_checking_position[1], direction);
 
                         if (next_position == null) {
-                            next_position_is_null = true;
+                            next_position_is_blocked = true;
                             break;
                         }
 
-                        String current_checking_position_turn = board[current_checking_position[0]][current_checking_position[1]].getText().trim();
+                        String current_checking_position_turn = board[last_checking_position[0]][last_checking_position[1]].getText().trim();
                         String next_position_turn = board[next_position[0]][next_position[1]].getText().trim();
 
                         if (
@@ -141,20 +144,19 @@ public class Bot {
                                 current_checking_position_turn.equalsIgnoreCase(player_turn)
                         ){
                             System.out.println(next_position[0] + " "+ next_position[1] + " #2 here -> RC: " + r + " " + " " + c);
-                            outlier_predict_score++;
-                            if (outlier_predict_score == 0){
-                                current_direction_min_score--;
+                            if (min_outlier_predict_score > -2) {
+                                min_outlier_predict_score--;
                             }
                             break;
                         }else{
                             break;
                         }
-                        current_checking_position = next_position;
-
+                        last_checking_position = next_position;
                     }
 
-
-                    if (current_direction_min_score <= -(this.playground.maxMatchToWin-2) && !next_position_is_null){
+                    String current_checking_position_turn = board[last_checking_position[0]][last_checking_position[1]].getText().trim();
+                    if (current_direction_min_score <= -(this.playground.maxMatchToWin-2)){
+                        System.out.printf("#1 RC: %d %d has xxx\n", r, c);
                         int current_direction_index = paired_direction_as_arraylist.indexOf(direction);
                         String opposite_direction = paired_direction_as_arraylist.get(current_direction_index == 0 ? 1 : 0);
                         int[] opposite_position = this.playground.gameEvent.getNextPosition(r, c, opposite_direction);
@@ -162,13 +164,20 @@ public class Bot {
                             String opposite_position_turn = board[opposite_position[0]][opposite_position[1]].getText().trim();
                             if (opposite_position_turn.isEmpty()){
                                 current_direction_min_score--;
+                                has_strong_min_score = true;
+
                             }
+                        }else{
+                            current_direction_min_score++;
                         }
+                    }
+
+                    if (current_direction_min_score == -(this.playground.maxMatchToWin-1)){
+                        has_strong_min_score = true;
                     }
 
                     paired_direction_min_score += current_direction_min_score;
                     paired_direction_max_score += current_direction_max_score;
-
                 }
 
                 if (paired_direction_min_score < min_score) {min_score = paired_direction_min_score;}
@@ -178,7 +187,10 @@ public class Bot {
                     System.out.println("Win Matched Position: " + p_direction[0]+ " " + p_direction[1]);
                     break;
                 }
+            }
 
+            if (!has_strong_min_score && min_outlier_predict_score < 0){
+                min_score--;
             }
 
             if (min_score < 0){
@@ -220,7 +232,7 @@ public class Bot {
 
         try {
             // Run all tasks and wait for them to finish
-            List<Future<TaskResult>> results = executor.invokeAll(task_list);
+            List<Future<TaskResult>> results = hard_bot_task_hard_bot_task_executor.invokeAll(task_list);
             int[] min_position_to_play = new int[2];
             int[] max_position_to_play = new int[2];
             int max_score = Integer.MIN_VALUE;
