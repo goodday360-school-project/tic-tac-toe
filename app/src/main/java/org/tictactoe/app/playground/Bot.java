@@ -17,6 +17,7 @@ class TaskResult{
     int c;
     int min_score;
     int max_score;
+    boolean strong_min_score;
 }
 
 public class Bot {
@@ -87,7 +88,7 @@ public class Bot {
             String player_turn = this.playground.getPlayerTurn();
             String bot_turn = player_turn.equalsIgnoreCase("x") ? "o" : "x";
             int min_score = 0, max_score = 0;
-            boolean has_strong_min_score = false;
+            boolean strong_min_score = false;
             int min_outlier_predict_score = 0;
 
             /* Check Matched In Pair Direction */
@@ -112,7 +113,6 @@ public class Bot {
                     int current_direction_min_score = 0;
                     int current_direction_max_score = 0;
                     int[] last_checking_position = {r, c};
-                    boolean next_position_is_blocked = false;
                     while (true) {
                         if (paired_direction_max_score == (this.playground.maxMatchToWin - 1)) {
                             break;
@@ -121,7 +121,6 @@ public class Bot {
                         int[] next_position = this.playground.gameEvent.getNextPosition(last_checking_position[0], last_checking_position[1], direction);
 
                         if (next_position == null) {
-                            next_position_is_blocked = true;
                             break;
                         }
 
@@ -154,8 +153,10 @@ public class Bot {
                         last_checking_position = next_position;
                     }
 
-                    String current_checking_position_turn = board[last_checking_position[0]][last_checking_position[1]].getText().trim();
-                    if (current_direction_min_score <= -(this.playground.maxMatchToWin-2)){
+                    if (current_direction_min_score == -(this.playground.maxMatchToWin-1)){
+                        System.out.println("STRONG MIN SCORE");
+                        strong_min_score = true;
+                    }else if (current_direction_min_score <= -(this.playground.maxMatchToWin-2)){
                         System.out.printf("#1 RC: %d %d has xxx\n", r, c);
                         int current_direction_index = paired_direction_as_arraylist.indexOf(direction);
                         String opposite_direction = paired_direction_as_arraylist.get(current_direction_index == 0 ? 1 : 0);
@@ -164,16 +165,11 @@ public class Bot {
                             String opposite_position_turn = board[opposite_position[0]][opposite_position[1]].getText().trim();
                             if (opposite_position_turn.isEmpty()){
                                 current_direction_min_score--;
-                                has_strong_min_score = true;
-
+                                strong_min_score = true;
                             }
                         }else{
                             current_direction_min_score++;
                         }
-                    }
-
-                    if (current_direction_min_score == -(this.playground.maxMatchToWin-1)){
-                        has_strong_min_score = true;
                     }
 
                     paired_direction_min_score += current_direction_min_score;
@@ -189,7 +185,7 @@ public class Bot {
                 }
             }
 
-            if (!has_strong_min_score && min_outlier_predict_score < 0){
+            if (!strong_min_score && min_outlier_predict_score < 0){
                 min_score--;
             }
 
@@ -209,7 +205,7 @@ public class Bot {
             result.c = c;
             result.min_score = min_score;
             result.max_score = max_score;
-
+            result.strong_min_score = strong_min_score;
             return result;
         };
     }
@@ -220,69 +216,76 @@ public class Bot {
         String bot_turn = this.playground.getPlayerTurn().trim().equalsIgnoreCase("x") ? "o" : "x";
 
 
-        ArrayList<Callable<TaskResult>> task_list = new ArrayList<>();
+        if ((this.playground.x_played_move_count+this.playground.o_played_move_count) == 0){
+            int center_position = (int) Math.floor((double) 5/2);
+            play_position = new int[]{center_position, center_position};
+        }else{
+            ArrayList<Callable<TaskResult>> task_list = new ArrayList<>();
 
-        for (int r = 0; r < 5; r++){
-            for (int c = 0; c < 5; c++) {
-                Callable<TaskResult> new_task = this.hardBotTask(r,c);
-                task_list.add(new_task);
+            for (int r = 0; r < 5; r++) {
+                for (int c = 0; c < 5; c++) {
+                    Callable<TaskResult> new_task = this.hardBotTask(r, c);
+                    task_list.add(new_task);
+                }
             }
-        }
 
 
-        try {
-            // Run all tasks and wait for them to finish
-            List<Future<TaskResult>> results = hard_bot_task_hard_bot_task_executor.invokeAll(task_list);
-            int[] min_position_to_play = new int[2];
-            int[] max_position_to_play = new int[2];
-            int max_score = Integer.MIN_VALUE;
-            int min_score = Integer.MAX_VALUE;
+            try {
+                // Run all tasks and wait for them to finish
+                List<Future<TaskResult>> results = hard_bot_task_hard_bot_task_executor.invokeAll(task_list);
+                int[] min_position_to_play = new int[2];
+                int[] max_position_to_play = new int[2];
+                int max_score = Integer.MIN_VALUE;
+                int min_score = Integer.MAX_VALUE;
+                boolean has_strong_min_score = false;
 
-            for (Future<TaskResult> future : results) {
-                TaskResult result = future.get();
-                if (result == null) {
-                    continue;
+                for (Future<TaskResult> future : results) {
+                    TaskResult result = future.get();
+                    if (result == null) {
+                        continue;
+                    }
+                    if ((result.min_score < min_score || result.strong_min_score) && !has_strong_min_score) {
+                        min_score = result.min_score;
+                        min_position_to_play = new int[]{result.r, result.c};
+                        if (result.strong_min_score) has_strong_min_score = true;
+                    }
+
+                    if (result.max_score > max_score) {
+                        max_score = result.max_score;
+                        max_position_to_play = new int[]{result.r, result.c};
+                    }
+                    System.out.println("Min: " + result.min_score + " Max: " + result.max_score + " Pos: " + result.r + " " + result.c);
                 }
-                if (result.min_score < min_score) {
-                    min_score = result.min_score;
-                    min_position_to_play = new int[]{result.r, result.c};
-                }
+                System.out.println("Picked-> Min: " + min_score + " Max: " + max_score);
+                System.out.println("Picked-> Min Pos: " + min_position_to_play[0] + " " + min_position_to_play[1]);
+                System.out.println("Picked-> Max Pos: " + max_position_to_play[0] + " " + max_position_to_play[1]);
 
-                if (result.max_score > max_score) {
-                    max_score = result.max_score;
-                    max_position_to_play = new int[]{result.r, result.c};
-                }
-                System.out.println("Min: " + result.min_score + " Max: " + result.max_score + " Pos: " + result.r + " " + result.c);
-            }
-            System.out.println("Picked-> Min: " + min_score + " Max: " + max_score);
-            System.out.println("Picked-> Min Pos: " + min_position_to_play[0] + " " + min_position_to_play[1]);
-            System.out.println("Picked-> Max Pos: " + max_position_to_play[0] + " " + max_position_to_play[1]);
-
-            if (max_score == this.playground.maxMatchToWin) {
-                play_position = max_position_to_play;
-            } else if (min_score <= -this.playground.maxMatchToWin) {
-                play_position = min_position_to_play;
-            } else if (max_score > 0) {
-                play_position = max_position_to_play;
-            } else {
-                // ===> Play Any Random Move if no score
-                ArrayList<Integer[]> available_move = new ArrayList<>();
-                for (int r = 0; r < 5; r++) {
-                    for (int c = 0; c < 5; c++) {
-                        if (board[r][c].getText().trim().equalsIgnoreCase("")) {
-                            available_move.add(new Integer[]{r, c});
+                if (max_score == this.playground.maxMatchToWin) {
+                    play_position = max_position_to_play;
+                } else if (min_score <= -this.playground.maxMatchToWin) {
+                    play_position = min_position_to_play;
+                } else if (max_score > 0) {
+                    play_position = max_position_to_play;
+                } else {
+                    // ===> Play Any Random Move if no score
+                    ArrayList<Integer[]> available_move = new ArrayList<>();
+                    for (int r = 0; r < 5; r++) {
+                        for (int c = 0; c < 5; c++) {
+                            if (board[r][c].getText().trim().equalsIgnoreCase("")) {
+                                available_move.add(new Integer[]{r, c});
+                            }
                         }
                     }
+                    if (!available_move.isEmpty()) {
+                        Collections.shuffle(available_move);
+                        play_position = new int[]{available_move.get(0)[0], available_move.get(0)[1]};
+                    }
+                    // <===
                 }
-                if (!available_move.isEmpty()) {
-                    Collections.shuffle(available_move);
-                    play_position = new int[]{available_move.get(0)[0], available_move.get(0)[1]};
-                }
-                // <===
-            }
 
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
         }
 
 
