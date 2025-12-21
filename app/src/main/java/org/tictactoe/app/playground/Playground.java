@@ -160,6 +160,8 @@ public class Playground {
         statusContainer.add(status_panel, BorderLayout.CENTER);
 
         // <===
+
+
         // ===> Add Text to Status Panel
 
         JLabel title = new JLabel("STATUS");

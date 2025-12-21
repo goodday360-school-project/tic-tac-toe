@@ -17,8 +17,8 @@ class TaskResult{
     int c;
     int min_score;
     int max_score;
-    boolean strong_min_score;
-    boolean strong_max_score;
+    int strong_min_score;
+    int strong_max_score;
 }
 
 public class Bot {
@@ -89,8 +89,8 @@ public class Bot {
             String player_turn = this.playground.getPlayerTurn();
             String bot_turn = player_turn.equalsIgnoreCase("x") ? "o" : "x";
             int min_score = 0, max_score = 0;
-            boolean strong_min_score = false;
-            boolean strong_max_score = false;
+            int strong_min_score = 0;
+            int strong_max_score = 0;
             int min_outlier_predict_score = 0;
             int max_outlier_predict_score = 0;
 
@@ -146,7 +146,6 @@ public class Bot {
                             }
                         }
 
-
                         // <===
 
                         // ===> Focus on Minimizer
@@ -176,7 +175,7 @@ public class Bot {
 
                     // ===> Calculate for Strong Maximizer
                     if (current_direction_max_score == (this.playground.maxMatchToWin-1)){
-                        strong_max_score = true;
+                        strong_max_score = 2;
                     }else if (current_direction_max_score >= (this.playground.maxMatchToWin-2)){
                         int current_direction_index = paired_direction_as_arraylist.indexOf(direction);
                         String opposite_direction = paired_direction_as_arraylist.get(current_direction_index == 0 ? 1 : 0);
@@ -185,7 +184,7 @@ public class Bot {
                             String opposite_position_turn = board[opposite_position[0]][opposite_position[1]].getText().trim();
                             if (opposite_position_turn.isEmpty()){
                                 current_direction_max_score++;
-                                strong_max_score = true;
+                                if (strong_max_score == 0) strong_max_score = 1;
                             }
                         }else{
                             current_direction_max_score--;
@@ -197,7 +196,7 @@ public class Bot {
 
                     // ===> Calculate for Strong Minimizer
                     if (current_direction_min_score == -(this.playground.maxMatchToWin-1)){
-                        strong_min_score = true;
+                        strong_min_score = -2;
                     }else if (current_direction_min_score <= -(this.playground.maxMatchToWin-2)){
                         System.out.printf("#1 RC: %d %d has xxx\n", r, c);
                         int current_direction_index = paired_direction_as_arraylist.indexOf(direction);
@@ -207,7 +206,7 @@ public class Bot {
                             String opposite_position_turn = board[opposite_position[0]][opposite_position[1]].getText().trim();
                             if (opposite_position_turn.isEmpty()){
                                 current_direction_min_score--;
-                                strong_min_score = true;
+                                if (strong_min_score == 0) strong_min_score = -1;
                             }
                         }else{
                             current_direction_min_score++;
@@ -228,11 +227,11 @@ public class Bot {
                 }
             }
 
-            if (!strong_min_score && min_outlier_predict_score < 0){
+            if (strong_min_score == 0 && min_outlier_predict_score < 0){
                 min_score--;
             }
 
-            if (!strong_max_score && max_outlier_predict_score > 0){
+            if (strong_max_score == 0 && max_outlier_predict_score > 0){
                 max_score++;
             }
 
@@ -285,24 +284,24 @@ public class Bot {
                 int[] max_position_to_play = new int[2];
                 int max_score = Integer.MIN_VALUE;
                 int min_score = Integer.MAX_VALUE;
-                boolean has_strong_min_score = false;
-                boolean has_strong_max_score = false;
+                int current_strong_min_score = 0;
+                int current_strong_max_score = 0;
 
                 for (Future<TaskResult> future : results) {
                     TaskResult result = future.get();
                     if (result == null) {
                         continue;
                     }
-                    if ((result.min_score < min_score || result.strong_min_score) && !has_strong_min_score) {
+                    if (result.min_score < min_score || result.strong_min_score < current_strong_min_score) {
                         min_score = result.min_score;
                         min_position_to_play = new int[]{result.r, result.c};
-                        if (result.strong_min_score) has_strong_min_score = true;
+                        current_strong_min_score = result.strong_min_score;
                     }
 
-                    if ((result.max_score > max_score || result.strong_max_score) && !has_strong_max_score) {
+                    if ((result.max_score > max_score || result.strong_max_score > current_strong_max_score)) {
                         max_score = result.max_score;
                         max_position_to_play = new int[]{result.r, result.c};
-                        if (result.strong_max_score) has_strong_max_score = true;
+                        current_strong_max_score = result.strong_max_score;
                     }
                     System.out.println("Min: " + result.min_score + " Max: " + result.max_score + " Pos: " + result.r + " " + result.c);
                 }
