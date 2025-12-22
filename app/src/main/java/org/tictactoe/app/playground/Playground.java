@@ -49,6 +49,12 @@ public class Playground {
 
     public Playground(JFrame mainFrame, int difficulty) {
 
+        /* Reset `mainFrame` */
+        mainFrame.getContentPane().removeAll();
+        mainFrame.revalidate();
+        mainFrame.repaint();
+
+        /* --- */
         /* Styling `mainFrame` */
         this.mainFrame = mainFrame;
         this.mainFrame.setSize(width, height);
@@ -68,7 +74,8 @@ public class Playground {
         mainFrame.setVisible(true);
 
         /* Initialize Bot */
-        this.player_turn =  "o"; //Utils.shuffleArray(new String[]{"x","o"})[0];
+//        this.player_turn =  "o";
+        this.player_turn = Utils.shuffleArray(new String[]{"x","o"})[0];
         this.player_turn_label.setText("- Player: "+player_turn.toUpperCase());
         this.bot = new Bot(difficulty,this);
         if (!current_turn.equalsIgnoreCase(player_turn)) {

@@ -72,12 +72,8 @@ public class Bot {
             String bot_turn = this.playground.getPlayerTurn().equalsIgnoreCase("x") ? "o" : "x";
             Collections.shuffle(available_move);
 
-            board[available_move.get(0)[0]][available_move.get(0)[1]].setText(bot_turn.toUpperCase());
-            this.playground.incrementPlayedMoveCount(bot_turn);
-            this.playground.switchCurrentTurn();
+            this.playground.playMove(available_move.get(0)[0], available_move.get(0)[1], bot_turn);
         }
-
-        this.playground.gameEvent.checkGameResult(available_move.get(0)[0], available_move.get(0)[1]);
     }
 
     private Callable<TaskResult> hardBotTask(int r, int c) {
@@ -235,6 +231,7 @@ public class Bot {
                 max_score++;
             }
 
+            // ===> Current Position Score Adjustment
             if (min_score < 0){
                 min_score--;
             }
@@ -242,6 +239,7 @@ public class Bot {
             if (max_score > 0){
                 max_score++;
             }
+            // <===
 
 
 
@@ -310,7 +308,11 @@ public class Bot {
                 System.out.println("Picked-> Max Pos: " + max_position_to_play[0] + " " + max_position_to_play[1]);
 
                 if (max_score == this.playground.maxMatchToWin) {
-                    play_position = max_position_to_play;
+                    if (current_strong_min_score == -2 && current_strong_max_score <= 1){
+                        play_position = min_position_to_play;
+                    }else{
+                        play_position = max_position_to_play;
+                    }
                 } else if (min_score <= -this.playground.maxMatchToWin) {
                     play_position = min_position_to_play;
                 } else if (max_score > 0) {
