@@ -74,8 +74,8 @@ public class Playground {
         mainFrame.setVisible(true);
 
         /* Initialize Bot */
-//        this.player_turn =  "o";
-        this.player_turn = Utils.shuffleArray(new String[]{"x","o"})[0];
+        this.player_turn =  "x";
+//        this.player_turn = Utils.shuffleArray(new String[]{"x","o"})[0];
         this.player_turn_label.setText("- Player: "+player_turn.toUpperCase());
         this.bot = new Bot(difficulty,this);
         if (!current_turn.equalsIgnoreCase(player_turn)) {
@@ -341,7 +341,7 @@ class GameEvent {
                         ". Must be one of: n, s, e, w, ne, nw, se, sw");
         }
 
-        // Boundary check (assuming 5x5 grid)
+        // Boundary check (Base on grid size)
         if (new_r >= 5 || new_c >= 5 || new_r < 0 || new_c < 0) {
             return null;
         }

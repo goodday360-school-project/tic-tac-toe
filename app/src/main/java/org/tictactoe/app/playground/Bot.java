@@ -181,6 +181,8 @@ public class Bot {
                             if (opposite_position_turn.isEmpty()){
                                 current_direction_max_score++;
                                 if (strong_max_score == 0) strong_max_score = 1;
+                            }else if (opposite_position_turn.equalsIgnoreCase(bot_turn)){
+                                strong_max_score = 2;
                             }
                         }else{
                             current_direction_max_score--;
@@ -203,6 +205,8 @@ public class Bot {
                             if (opposite_position_turn.isEmpty()){
                                 current_direction_min_score--;
                                 if (strong_min_score == 0) strong_min_score = -1;
+                            }else if (opposite_position_turn.equalsIgnoreCase(player_turn)){
+                                strong_min_score = -2;
                             }
                         }else{
                             current_direction_min_score++;
@@ -290,13 +294,13 @@ public class Bot {
                     if (result == null) {
                         continue;
                     }
-                    if (result.min_score < min_score || result.strong_min_score < current_strong_min_score) {
+                    if ((result.min_score < min_score) || (result.strong_min_score < current_strong_min_score)) {
                         min_score = result.min_score;
                         min_position_to_play = new int[]{result.r, result.c};
                         current_strong_min_score = result.strong_min_score;
                     }
 
-                    if ((result.max_score > max_score || result.strong_max_score > current_strong_max_score)) {
+                    if ((result.max_score > max_score) || (result.strong_max_score > current_strong_max_score)) {
                         max_score = result.max_score;
                         max_position_to_play = new int[]{result.r, result.c};
                         current_strong_max_score = result.strong_max_score;
@@ -307,7 +311,7 @@ public class Bot {
                 System.out.println("Picked-> Min Pos: " + min_position_to_play[0] + " " + min_position_to_play[1]);
                 System.out.println("Picked-> Max Pos: " + max_position_to_play[0] + " " + max_position_to_play[1]);
 
-                if (max_score == this.playground.maxMatchToWin) {
+                if (max_score >= this.playground.maxMatchToWin) {
                     if (current_strong_min_score == -2 && current_strong_max_score <= 1){
                         play_position = min_position_to_play;
                     }else{
