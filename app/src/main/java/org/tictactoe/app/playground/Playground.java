@@ -74,8 +74,8 @@ public class Playground {
         mainFrame.setVisible(true);
 
         /* Initialize Bot */
-        this.player_turn =  "x";
-//        this.player_turn = Utils.shuffleArray(new String[]{"x","o"})[0];
+//        this.player_turn =  "x";
+        this.player_turn = Utils.shuffleArray(new String[]{"x","o"})[0];
         this.player_turn_label.setText("- Player: "+player_turn.toUpperCase());
         this.bot = new Bot(difficulty,this);
         if (!current_turn.equalsIgnoreCase(player_turn)) {

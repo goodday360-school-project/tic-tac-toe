@@ -294,6 +294,7 @@ public class Bot {
                     if (result == null) {
                         continue;
                     }
+                    // ===> Pick Best Min/Max Score Position
                     if ((result.min_score < min_score) || (result.strong_min_score < current_strong_min_score)) {
                         min_score = result.min_score;
                         min_position_to_play = new int[]{result.r, result.c};
@@ -305,11 +306,14 @@ public class Bot {
                         max_position_to_play = new int[]{result.r, result.c};
                         current_strong_max_score = result.strong_max_score;
                     }
+                    // <===
                     System.out.println("Min: " + result.min_score + " Max: " + result.max_score + " Pos: " + result.r + " " + result.c);
                 }
                 System.out.println("Picked-> Min: " + min_score + " Max: " + max_score);
                 System.out.println("Picked-> Min Pos: " + min_position_to_play[0] + " " + min_position_to_play[1]);
                 System.out.println("Picked-> Max Pos: " + max_position_to_play[0] + " " + max_position_to_play[1]);
+
+                // ===> Calculate to choose position between Min or Max to play.
 
                 if (max_score >= this.playground.maxMatchToWin) {
                     if (current_strong_min_score == -2 && current_strong_max_score <= 1){
@@ -337,6 +341,7 @@ public class Bot {
                     }
                     // <===
                 }
+                // <====
 
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
