@@ -17,8 +17,8 @@ class TaskResult{
     int c;
     int min_score;
     int max_score;
-    int strong_min_score;
-    int strong_max_score;
+    boolean strong_min_score;
+    boolean strong_max_score;
 }
 
 public class Bot {
@@ -86,8 +86,8 @@ public class Bot {
             String player_turn = this.playground.getPlayerTurn();
             String bot_turn = player_turn.equalsIgnoreCase("x") ? "o" : "x";
             int min_score = 0, max_score = 0;
-            int strong_min_score = 0;
-            int strong_max_score = 0;
+            boolean strong_min_score = false;
+            boolean strong_max_score = false;
             int min_outlier_predict_score = 0;
             int max_outlier_predict_score = 0;
 
@@ -183,16 +183,16 @@ public class Bot {
                 if (sum_max_score > max_score) max_score = sum_max_score;
 
                 if (sum_min_score <= -(this.playground.maxMatchToWin - 1)){
-                    strong_min_score = -2;
+                    strong_min_score = true;
                 }
 
                 if (sum_max_score >= (this.playground.maxMatchToWin - 1)){
-                    strong_max_score = 2;
+                    strong_max_score = true;
                 }
 
 
 
-                if (strong_min_score == 0 && strong_max_score == 0){ // <== Find more outlier score if no wining position yet.
+                if (!strong_min_score && !strong_max_score){ // <== Find more outlier score if no wining position yet.
                     for (int direction_index=0; direction_index<=1; direction_index++){
                         String opposite_direction = p_direction[direction_index == 0 ? 1 : 0];
                         int[] opposite_position = this.playground.gameEvent.getNextPosition(r, c, opposite_direction);
@@ -288,25 +288,21 @@ public class Bot {
                 int[] max_position_to_play = new int[2];
                 int max_score = Integer.MIN_VALUE;
                 int min_score = Integer.MAX_VALUE;
-                int current_strong_min_score = 0;
-                int current_strong_max_score = 0;
 
                 for (Future<TaskResult> future : results) {
                     TaskResult result = future.get();
                     if (result == null) {
                         continue;
                     }
-                    // ===> Pick Best Min/Max Score Position
-                    if ((result.min_score < min_score) || (result.strong_min_score < current_strong_min_score)) {
+                    // ===> Pick Lowest Min and Highest Max Score Position
+                    if ((result.min_score < min_score) || (result.strong_min_score)) {
                         min_score = result.min_score;
                         min_position_to_play = new int[]{result.r, result.c};
-                        current_strong_min_score = result.strong_min_score;
                     }
 
-                    if ((result.max_score > max_score) || (result.strong_max_score > current_strong_max_score)) {
+                    if ((result.max_score > max_score) || (result.strong_max_score)) {
                         max_score = result.max_score;
                         max_position_to_play = new int[]{result.r, result.c};
-                        current_strong_max_score = result.strong_max_score;
                     }
                     // <===
                     System.out.println("Min: " + result.min_score + " Max: " + result.max_score + " Pos: " + result.r + " " + result.c);
@@ -316,13 +312,8 @@ public class Bot {
                 System.out.println("Picked-> Max Pos: " + max_position_to_play[0] + " " + max_position_to_play[1]);
 
                 // ===> Calculate to choose position between Min or Max to play.
-
                 if (max_score >= this.playground.maxMatchToWin) {
-                    if (current_strong_min_score == -2 && current_strong_max_score <= 1){
-                        play_position = min_position_to_play;
-                    }else{
-                        play_position = max_position_to_play;
-                    }
+                    play_position = max_position_to_play;
                 } else if (min_score <= -this.playground.maxMatchToWin) {
                     play_position = min_position_to_play;
                 } else if (max_score > 0) {
