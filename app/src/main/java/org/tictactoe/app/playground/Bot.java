@@ -17,8 +17,8 @@ class TaskResult{
     int c;
     int min_score;
     int max_score;
-    boolean strong_min_score;
-    boolean strong_max_score;
+    boolean is_strong_min_score;
+    boolean is_strong_max_score;
 }
 
 public class Bot {
@@ -86,8 +86,8 @@ public class Bot {
             String player_turn = this.playground.getPlayerTurn();
             String bot_turn = player_turn.equalsIgnoreCase("x") ? "o" : "x";
             int min_score = 0, max_score = 0;
-            boolean strong_min_score = false;
-            boolean strong_max_score = false;
+            boolean is_strong_min_score = false;
+            boolean is_strong_max_score = false;
             int min_outlier_predict_score = 0;
             int max_outlier_predict_score = 0;
 
@@ -183,16 +183,16 @@ public class Bot {
                 if (sum_max_score > max_score) max_score = sum_max_score;
 
                 if (sum_min_score <= -(this.playground.maxMatchToWin - 1)){
-                    strong_min_score = true;
+                    is_strong_min_score = true;
                 }
 
                 if (sum_max_score >= (this.playground.maxMatchToWin - 1)){
-                    strong_max_score = true;
+                    is_strong_max_score = true;
                 }
 
 
 
-                if (!strong_min_score && !strong_max_score){ // <== Find more outlier score if no wining position yet.
+                if (!is_strong_min_score && !is_strong_max_score){ // <== Find more outlier score if no wining position yet.
                     for (int direction_index=0; direction_index<=1; direction_index++){
                         String opposite_direction = p_direction[direction_index == 0 ? 1 : 0];
                         int[] opposite_position = this.playground.gameEvent.getNextPosition(r, c, opposite_direction);
@@ -254,8 +254,8 @@ public class Bot {
             result.c = c;
             result.min_score = min_score;
             result.max_score = max_score;
-            result.strong_min_score = strong_min_score;
-            result.strong_max_score = strong_max_score;
+            result.is_strong_min_score = is_strong_min_score;
+            result.is_strong_max_score = is_strong_max_score;
             return result;
         };
     }
@@ -295,12 +295,12 @@ public class Bot {
                         continue;
                     }
                     // ===> Pick Lowest Min and Highest Max Score Position
-                    if ((result.min_score < min_score) || (result.strong_min_score)) {
+                    if ((result.min_score < min_score) || (result.is_strong_min_score)) {
                         min_score = result.min_score;
                         min_position_to_play = new int[]{result.r, result.c};
                     }
 
-                    if ((result.max_score > max_score) || (result.strong_max_score)) {
+                    if ((result.max_score > max_score) || (result.is_strong_max_score)) {
                         max_score = result.max_score;
                         max_position_to_play = new int[]{result.r, result.c};
                     }
