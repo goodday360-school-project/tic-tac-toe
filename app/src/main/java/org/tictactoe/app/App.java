@@ -14,8 +14,8 @@ public class App {
     private static final JFrame mainFrame = new JFrame("Tic Tac Toe");
 
     public static void main(String[] args) {
-//        Playground playground = new Playground(mainFrame, 0);
-            Menu menu = new Menu(mainFrame);
+        Playground playground = new Playground(mainFrame, 1);
+//            Menu menu = new Menu(mainFrame);
 
     }
 }

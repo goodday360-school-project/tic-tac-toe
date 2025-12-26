@@ -21,10 +21,11 @@ import org.tictactoe.app.utils.Utils;
 public class Playground {
     GameEvent gameEvent = new GameEvent(this);
 
-    int width = 1000;
-    int height = 650;
+    int width = 1200;
+    int height = 750;
 
-    public final int maxMatchToWin = 4;
+    public final int maxMatchToWin = 5;
+    public final int boardSize = 7;
 
     public boolean isWorking = false;
     public boolean gameEnd = false;
@@ -33,7 +34,7 @@ public class Playground {
 
     private final JFrame mainFrame;
 
-    JButton[][] board = new JButton[5][5];
+    JButton[][] board = new JButton[boardSize][boardSize];
 
     private String current_turn = "x";
     private final JLabel current_turn_label = new JLabel("- Turn: " + this.current_turn.toUpperCase());
@@ -74,8 +75,8 @@ public class Playground {
         mainFrame.setVisible(true);
 
         /* Initialize Bot */
-//        this.player_turn =  "x";
-        this.player_turn = Utils.shuffleArray(new String[]{"x","o"})[0];
+        this.player_turn =  "x";
+//        this.player_turn = Utils.shuffleArray(new String[]{"x","o"})[0];
         this.player_turn_label.setText("- Player: "+player_turn.toUpperCase());
         this.bot = new Bot(difficulty,this);
         if (!current_turn.equalsIgnoreCase(player_turn)) {
@@ -236,19 +237,19 @@ public class Playground {
         // <===
 
         JPanel boardPanel = new JPanel();
-        boardPanel.setLayout(new GridLayout(5,5));
+        boardPanel.setLayout(new GridLayout(boardSize,boardSize));
         boardPanel.setBackground(Color.DARK_GRAY);
         boardPanel.setOpaque(true);
         boardPanel.setPreferredSize(new Dimension(600, 600));
         boardContainer.add(boardPanel, BorderLayout.CENTER);
 
 
-        for (int r = 0; r < 5; r++){
-            for (int c = 0; c < 5; c++) {
+        for (int r = 0; r < boardSize; r++){
+            for (int c = 0; c < boardSize; c++) {
 
                 /* Styling `tile` */
                 JButton tile = new JButton();
-                tile.setFont(Utils.getFont(150f));
+                tile.setFont(Utils.getFont(110));
                 tile.setForeground(new Color(0,220,255));
 
                 tile.setHorizontalAlignment(SwingConstants.CENTER);
@@ -256,8 +257,13 @@ public class Playground {
 
                 tile.setFocusPainted(false);
                 tile.setBackground(new Color(87,72,82));
-                tile.setBorder(new LineBorder(new Color(186,145,88), 5));
+                tile.setBorder(new LineBorder(new Color(186,145,88), 3));
                 tile.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+                tile.setHorizontalAlignment(SwingConstants.CENTER);
+                tile.setVerticalAlignment(SwingConstants.CENTER);
+                tile.setHorizontalTextPosition(SwingConstants.CENTER);
+                tile.setVerticalTextPosition(SwingConstants.CENTER);
 
                 // ===> Hover Effect
                 final int finalR = r;
@@ -342,7 +348,8 @@ class GameEvent {
         }
 
         // Boundary check (Base on grid size)
-        if (new_r >= 5 || new_c >= 5 || new_r < 0 || new_c < 0) {
+        int boardSize = this.playground.boardSize;
+        if (new_r >= boardSize || new_c >= boardSize || new_r < 0 || new_c < 0) {
             return null;
         }
 
