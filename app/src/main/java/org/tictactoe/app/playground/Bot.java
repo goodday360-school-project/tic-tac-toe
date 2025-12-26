@@ -27,7 +27,7 @@ public class Bot {
 
 
     private static final ExecutorService bot_play_executor = Executors.newFixedThreadPool(1);
-    private static final ExecutorService hard_bot_task_hard_bot_task_executor = Executors.newFixedThreadPool(7*7);
+    private static final ExecutorService hard_bot_task_hard_bot_task_executor = Executors.newFixedThreadPool((int) Math.pow(Playground.boardSize, 2));
 
     public Bot(int difficulty, Playground playground){
         this.playground = playground;
@@ -91,7 +91,7 @@ public class Bot {
             int min_outlier_predict_score = 0;
             int max_outlier_predict_score = 0;
 
-            /* Check Matched In Pair Direction */
+            /* Check Matched Direction In Pair */
             //      NW  N  NE
             //      W - | - E
             //      SW  S  SE
@@ -265,7 +265,6 @@ public class Bot {
         int[] play_position = null;
         JButton[][] board = this.playground.board;
         String bot_turn = this.playground.getPlayerTurn().trim().equalsIgnoreCase("x") ? "o" : "x";
-
 
         if ((this.playground.x_played_move_count+this.playground.o_played_move_count) == 0){
             int center_position = (int) Math.floor((double) boardSize/2);

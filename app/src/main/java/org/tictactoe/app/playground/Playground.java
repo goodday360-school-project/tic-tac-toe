@@ -21,11 +21,11 @@ import org.tictactoe.app.utils.Utils;
 public class Playground {
     GameEvent gameEvent = new GameEvent(this);
 
-    int width = 1200;
-    int height = 750;
+    public final static int width = 1200;
+    public final static int height = 750;
 
-    public final int maxMatchToWin = 5;
-    public final int boardSize = 7;
+    public final static int maxMatchToWin = 5;
+    public final static int boardSize = 7;
 
     public boolean isWorking = false;
     public boolean gameEnd = false;
@@ -330,7 +330,7 @@ class GameEvent {
         }
 
         // Boundary check (Base on grid size)
-        int boardSize = this.playground.boardSize;
+        int boardSize = Playground.boardSize;
         if (new_r >= boardSize || new_c >= boardSize || new_r < 0 || new_c < 0) {
             return null;
         }
