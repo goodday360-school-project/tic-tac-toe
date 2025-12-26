@@ -72,8 +72,8 @@ public class Bot {
         if (!available_move.isEmpty()){
             String bot_turn = this.playground.getPlayerTurn().equalsIgnoreCase("x") ? "o" : "x";
             Collections.shuffle(available_move);
-
-            this.playground.playMove(available_move.get(0)[0], available_move.get(0)[1], bot_turn);
+            this.playground.isWorking = false;
+            this.playground.gameEvent.playMove(available_move.get(0)[0], available_move.get(0)[1], bot_turn);
         }
     }
 
@@ -323,7 +323,7 @@ public class Bot {
                     ArrayList<Integer[]> available_move = new ArrayList<>();
                     for (int r = 0; r < boardSize; r++) {
                         for (int c = 0; c < boardSize; c++) {
-                            if (board[r][c].getText().trim().equalsIgnoreCase("")) {
+                            if (board[r][c].getText().trim().isEmpty()) {
                                 available_move.add(new Integer[]{r, c});
                             }
                         }
@@ -343,7 +343,8 @@ public class Bot {
 
 
         if (play_position != null){
-            this.playground.playMove(play_position[0], play_position[1], bot_turn);
+            this.playground.isWorking = false;
+            this.playground.gameEvent.playMove(play_position[0], play_position[1], bot_turn);
         }else{
             throw new RuntimeException("Play Position should not be null!");
         }

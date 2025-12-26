@@ -95,6 +95,7 @@ public class Playground {
     }
 
 
+
     public void switchCurrentTurn() {
         System.out.println("Switching Turn From: " + this.current_turn);
         if (this.current_turn.trim().equalsIgnoreCase("x")){
@@ -116,26 +117,7 @@ public class Playground {
         }
     }
 
-    public void playMove(int r, int c, String turn){
-        // ===> Apply New Text Color After Played Move
-        JButton tile = board[r][c];
-        tile.setBackground(new Color(87,72,82));
-        tile.setText(turn.toUpperCase());
-        if (tile.getText().trim().equalsIgnoreCase("x")){
-            tile.setForeground(new Color(254,137,9));
-        }else{
-            tile.setForeground(new Color(0,220,255));
-        }
-        // <===
 
-        // ===> Increment Turn Played Move Count
-        this.incrementPlayedMoveCount(tile.getText());
-        // <===
-
-        this.gameEvent.checkGameResult(r, c);
-        this.switchCurrentTurn();
-        System.out.println("Turn: " + this.current_turn);
-    }
 
     /* Setup UI */
     private void SetupStatusContainer() {
@@ -287,7 +269,7 @@ public class Playground {
 
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        gameEvent.playerPlay(finalR, finalC, tile);
+                        gameEvent.playMove(finalR, finalC, player_turn);
                     }
                 });
                 // <===
@@ -356,22 +338,43 @@ class GameEvent {
         return new int[]{new_r, new_c};
     }
 
-    public void playerPlay(int current_r, int current_c, JButton tile){
+
+    public void playMove(int r, int c, String turn){
+
+        JButton tile = this.playground.board[r][c];
         if (!tile.getText().trim().isEmpty() || this.playground.isWorking || this.playground.gameEnd) {
             return;
         }
 
-        if (this.playground.getCurrentTurn().equals(this.playground.getPlayerTurn())){
-            this.playground.playMove(current_r, current_c, this.playground.getPlayerTurn());
-        }else{
+        if (!this.playground.getCurrentTurn().equalsIgnoreCase(turn)){
             return;
         }
 
-        this.playground.isWorking = true;
-
-        // ===> Give Turn To Bot
-        this.playground.bot.play();
+        // ===> Apply New Text Color After Played Move
+        tile.setBackground(new Color(87,72,82));
+        tile.setText(turn.toUpperCase());
+        if (tile.getText().trim().equalsIgnoreCase("x")){
+            tile.setForeground(new Color(254,137,9));
+        }else{
+            tile.setForeground(new Color(0,220,255));
+        }
         // <===
+
+        // ===> Increment Turn Played Move Count
+        this.playground.incrementPlayedMoveCount(tile.getText());
+        // <===
+
+        this.checkGameResult(r, c);
+        this.playground.switchCurrentTurn();
+        System.out.println("Turn: " + this.playground.getCurrentTurn());
+
+        if (!this.playground.getCurrentTurn().equals(this.playground.getPlayerTurn())){
+            this.playground.isWorking = true;
+
+            // ===> Give Turn To Bot
+            this.playground.bot.play();
+            // <===
+        }
     }
 
     public void checkGameResult(int r, int c) {
