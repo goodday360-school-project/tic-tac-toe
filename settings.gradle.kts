@@ -11,4 +11,4 @@ plugins {
 }
 
 rootProject.name = "tic-tac-toe"
-include("app", "list", "utilities")
+include("app")

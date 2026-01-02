@@ -68,8 +68,9 @@ public class Menu {
 //            borderLabel.add(createStyledButton("Sign Out", e -> cardLayout.show(cardPanel, "SIGNIN")), insert(0, 0, 50, 0, GridBagConstraints.SOUTH, 1, 3));
         } else if (type.equals("DIFFICULTY")) {
             borderLabel.add(createStyledButton("Easy", e-> new Playground(mainFrame, 0)), insert(0, 0, -10, 0, GridBagConstraints.SOUTH, 1, 1));
-            borderLabel.add(createStyledButton("Hard", e-> new Playground(mainFrame, 1)), insert(0, 0, -10, 0, GridBagConstraints.SOUTH, 1, 2));
-            borderLabel.add(createStyledButton("Back", e -> cardLayout.show(cardPanel, "START")), insert(0, 0, 50, 0, GridBagConstraints.SOUTH, 1, 3));
+            borderLabel.add(createStyledButton("Normal", e-> new Playground(mainFrame, 1)), insert(0, 0, -10, 0, GridBagConstraints.SOUTH, 1, 2));
+            borderLabel.add(createStyledButton("Hard", e-> new Playground(mainFrame, 2)), insert(0, 0, -10, 0, GridBagConstraints.SOUTH, 1, 3));
+            borderLabel.add(createStyledButton("Back", e -> cardLayout.show(cardPanel, "START")), insert(0, 0, 50, 0, GridBagConstraints.SOUTH, 1, 4));
         }
 
         panel.add(borderLabel);
