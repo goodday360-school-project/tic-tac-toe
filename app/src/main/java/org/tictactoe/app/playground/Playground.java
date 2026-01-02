@@ -54,8 +54,8 @@ public class Playground {
         mainFrame.getContentPane().removeAll();
         mainFrame.revalidate();
         mainFrame.repaint();
-
         /* --- */
+
         /* Styling `mainFrame` */
         this.mainFrame = mainFrame;
         this.mainFrame.setSize(width, height);
@@ -74,8 +74,8 @@ public class Playground {
         mainFrame.pack();
         mainFrame.setVisible(true);
 
-        /* Initialize Bot */
-//        this.player_turn =  "x";
+        /* Initialize Player & Bot */
+        // this.player_turn = "x";
         this.player_turn = Utils.shuffleArray(new String[]{"x","o"})[0];
         this.player_turn_label.setText("- Player: "+player_turn.toUpperCase());
         this.bot = new Bot(difficulty,this);
