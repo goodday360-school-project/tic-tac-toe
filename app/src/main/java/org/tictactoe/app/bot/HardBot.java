@@ -160,6 +160,7 @@ public class HardBot {
                         }
 
                         int[] next_position = this.playground.gameEvent.getNextPosition(last_checking_position[0], last_checking_position[1], direction);
+                        last_paired_checking_position[direction_index] = next_position;
 
                         if (next_position == null) {
                             break;
@@ -192,18 +193,26 @@ public class HardBot {
                         // ===> Focus on Minimizer (Player Matches)
                         else if (
                                 next_position_turn.equalsIgnoreCase(player_turn) &&
-                                        (current_checking_position_turn.equalsIgnoreCase(player_turn) || current_checking_position_turn.isEmpty())
+                                (current_checking_position_turn.equalsIgnoreCase(player_turn) || current_checking_position_turn.isEmpty())
                         ){
                             paired_direction_min_score[direction_index]--;
                             System.out.println(next_position[0] + " "+ next_position[1] + " #1 here -> RC: " + r + " " + " " + c);
                         }else if (
                                 next_position_turn.trim().isEmpty() &&
-                                        current_checking_position_turn.equalsIgnoreCase(player_turn)
+                                current_checking_position_turn.equalsIgnoreCase(player_turn)
                         ){
                             System.out.println(next_position[0] + " "+ next_position[1] + " #2 here -> RC: " + r + " " + " " + c);
-                            if (min_outlier_predict_score == 0) {
-                                min_outlier_predict_score--;
+                            // ===> Additional Check Step to find if the next after this next position is not the player
+                            // Because it's unnecessary move.
+                            int[] temp_next_position = this.playground.gameEvent.getNextPosition(next_position[0], next_position[1], direction);
+                            if (temp_next_position != null) {
+                                String temp_next_position_turn = board[temp_next_position[0]][temp_next_position[1]].getText().trim();
+
+                                if (min_outlier_predict_score == 0 && !temp_next_position_turn.equalsIgnoreCase(player_turn)) {
+                                    min_outlier_predict_score--;
+                                }
                             }
+                            // <===
                             break;
                         }
                         // <===
@@ -211,7 +220,7 @@ public class HardBot {
                         else{
                             break;
                         }
-                        last_paired_checking_position[direction_index] = next_position;
+
                     }
 
                 }
