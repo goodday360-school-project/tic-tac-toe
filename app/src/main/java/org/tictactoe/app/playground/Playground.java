@@ -1,6 +1,7 @@
 package org.tictactoe.app.playground;
 
 import java.util.*;
+import java.io.*;
 
 /* awt Imports */
 import java.awt.*;
@@ -12,14 +13,22 @@ import javax.swing.*;
 import javax.swing.border.*;
 /* --- */
 
+/* JSON Import */
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+/* --- */
+
 /* Custom Package Imports */
 import org.tictactoe.app.utils.Utils;
 import org.tictactoe.app.bot.Bot;
+
 /* --- */
 
 
 public class Playground {
     public GameEvent gameEvent = new GameEvent(this);
+    public GameStatus gameStatus;
 
     public final static int width = 1200;
     public final static int height = 750;
@@ -50,6 +59,8 @@ public class Playground {
 
     public Playground(JFrame mainFrame, int difficulty) {
 
+
+
         /* Reset `mainFrame` */
         mainFrame.getContentPane().removeAll();
         mainFrame.revalidate();
@@ -75,10 +86,17 @@ public class Playground {
         mainFrame.setVisible(true);
 
         /* Initialize Player & Bot */
-        // this.player_turn = "x";
+//        this.player_turn = "x";
         this.player_turn = Utils.shuffleArray(new String[]{"x","o"})[0];
+
+        // ===> Initialize Game Status to JSON file
+        this.gameStatus = new GameStatus(difficulty,this);
+        // <===
+
+
         this.player_turn_label.setText("- Player: "+player_turn.toUpperCase());
         this.bot = new Bot(difficulty,this);
+
         if (!current_turn.equalsIgnoreCase(player_turn)) {
             this.bot.play();
         }

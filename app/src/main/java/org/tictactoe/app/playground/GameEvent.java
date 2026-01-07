@@ -88,6 +88,8 @@ public class GameEvent {
         this.playground.switchCurrentTurn();
         System.out.println("Turn: " + this.playground.getCurrentTurn());
 
+        this.playground.gameStatus.updateGameStatus(r, c, turn);
+
         if (!this.playground.getCurrentTurn().equals(this.playground.getPlayerTurn())){
             this.playground.isWorking = true;
 

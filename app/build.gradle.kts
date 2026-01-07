@@ -5,11 +5,17 @@
 plugins {
 	application
 	id("buildlogic.java-application-conventions")
+	id("com.gradleup.shadow") version "9.3.0"
 }
 
+repositories {
+	mavenCentral()
+}
 
 dependencies {
 	implementation("org.apache.commons:commons-text")
+	implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
+
 }
 
 application {
@@ -18,9 +24,14 @@ application {
 }
 
 tasks.jar {
+	archiveFileName.set("app-debug.jar")
 	manifest {
 		attributes["Main-Class"] = application.mainClass.get()
 	}
+}
+
+tasks.shadowJar {
+	archiveFileName.set("tic-tac-toe.jar")
 }
 
 

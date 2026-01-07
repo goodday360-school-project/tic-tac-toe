@@ -5,9 +5,20 @@ import java.awt.GraphicsEnvironment;
 import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Logger;
+import java.io.*;
 
 public class Utils {
     private static final Logger LOGGER = Logger.getLogger(Utils.class.getName());
+
+    public static String getJarDir() {
+        try {
+            File jarFile = new File(Utils.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            return jarFile.getParent();
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+
+    }
 
     public static Font getFont(float size) {
         try {
