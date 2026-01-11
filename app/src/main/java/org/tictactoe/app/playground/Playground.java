@@ -265,7 +265,7 @@ public class Playground {
                 tile.setHorizontalTextPosition(SwingConstants.CENTER);
                 tile.setVerticalTextPosition(SwingConstants.CENTER);
 
-                // ===> Hover Effect
+                // ===> Hover Effect And Mouse Click
                 final int finalR = r;
                 final int finalC = c;
                 tile.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -286,7 +286,7 @@ public class Playground {
                     }
 
                     @Override
-                    public void mouseClicked(MouseEvent e) {
+                    public void mousePressed(MouseEvent e) {
                         gameEvent.playMove(finalR, finalC, player_turn);
                     }
                 });

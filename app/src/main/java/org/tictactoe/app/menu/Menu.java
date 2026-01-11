@@ -52,8 +52,8 @@ public class Menu {
         borderLabel.setLayout(new GridBagLayout());
 
         String titleText = type.equals("DIFFICULTY") ? "Difficulty" : "Tic Tac Toe";
-        JLabel title = new JLabel("<html><i style='font-size:30px'>" + titleText + "</i></html>");
-        title.setFont(Utils.getFont(150f));
+        JLabel title = new JLabel(titleText);
+        title.setFont(Utils.getFont(40f));
         title.setForeground(Color.WHITE);
         borderLabel.add(title, insert(50, 0, 0, 0, GridBagConstraints.NORTH, 1, 0));
 
