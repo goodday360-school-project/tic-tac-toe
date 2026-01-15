@@ -17,6 +17,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.tictactoe.app.playground.GameStatus;
 import org.tictactoe.app.playground.Playground;
 import org.tictactoe.app.utils.Utils;
 
@@ -77,7 +78,11 @@ public class Menu {
         if (type.equals("START")) {
 
             borderLabel.add(createStyledButton("New Game", e -> cardLayout.show(cardPanel, "DIFFICULTY")), insert(0, 0, -20, 0, GridBagConstraints.SOUTH, 1, 1));
-            borderLabel.add(createStyledButton("Continue", e -> new Playground(mainFrame)), insert(0, 0, -20, 0, GridBagConstraints.SOUTH, 1, 2));
+
+            if (GameStatus.is_can_continue()){
+                borderLabel.add(createStyledButton("Continue", e -> new Playground(mainFrame)), insert(0, 0, -20, 0, GridBagConstraints.SOUTH, 1, 2));
+            }
+
             borderLabel.add(createStyledButton("stats", e -> cardLayout.show(cardPanel, "STATS")), insert(0, 0, 100, 0, GridBagConstraints.SOUTH, 1, 3));
         } else if (type.equals("DIFFICULTY")) {
             borderLabel.add(createStyledButton("Easy", e-> new Playground(mainFrame, 0)), insert(0, 0, -10, 0, GridBagConstraints.SOUTH, 1, 1));

@@ -283,20 +283,30 @@ public class HardBot {
             // <===
 
             // ===> Check min_score for another special around position
-            //     -
-            //     -
+            // -   -   -
+            //   - - -
             // - -   - -
-            //     -
-            //     -
+            //   - - -
+            // -   -   -
 
             String[] all_directions = {"n","s","e", "w", "ne", "sw", "nw", "se"};
+            Map<String, String> opposite_directions_map = Map.of( "n", "s", "s", "n", "e", "w", "w", "e", "ne", "sw", "sw", "ne", "nw", "se", "se", "nw" );
+
             int count_special_position = 0;
             for (String direction: all_directions) {
                 int[] last_checking_position = {r,c};
                 int direction_min_score = 0;
                 while (true) {
                     if (direction_min_score == -2) {
-                        count_special_position++;
+                        String opposite_direction = opposite_directions_map.get(direction);
+                        int[] opposite_position = this.playground.gameEvent.getNextPosition(r, c, opposite_direction);
+                        if (opposite_position != null) {
+                            String opposite_position_turn = board[opposite_position[0]][opposite_position[1]].getText();
+                            if (opposite_position_turn.isEmpty()) {
+                                count_special_position++;
+                            }
+                        }
+
                         break;
                     }
 
