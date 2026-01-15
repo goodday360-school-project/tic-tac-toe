@@ -33,7 +33,7 @@ public class Playground {
     public final static int width = 1200;
     public final static int height = 750;
 
-    public final static int maxMatchToWin = 5;
+    public final int maxMatchToWin = 5;
     public final static int boardSize = 7;
 
     public boolean isWorking = false;
@@ -45,9 +45,10 @@ public class Playground {
 
     public JButton[][] board = new JButton[boardSize][boardSize];
 
-    private String current_turn = "x";
+    public int difficulty;
+    public String current_turn = "x";
     private final JLabel current_turn_label = new JLabel("- Turn: " + this.current_turn.toUpperCase());
-    private final String player_turn;
+    public String player_turn;
     private final JLabel player_turn_label = new JLabel("- Player: ");
 
     /* Played Move */
@@ -57,33 +58,11 @@ public class Playground {
     private final JLabel o_played_move_label = new JLabel("  O: 0");
     /* --- */
 
+    // For New Game
     public Playground(JFrame mainFrame, int difficulty) {
 
-
-
-        /* Reset `mainFrame` */
-        mainFrame.getContentPane().removeAll();
-        mainFrame.revalidate();
-        mainFrame.repaint();
-        /* --- */
-
-        /* Styling `mainFrame` */
         this.mainFrame = mainFrame;
-        this.mainFrame.setSize(width, height);
-        this.mainFrame.setLocationRelativeTo(null);
-        this.mainFrame.setResizable(false);
-        this.mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.mainFrame.setLayout(new BoxLayout(mainFrame.getContentPane(), BoxLayout.X_AXIS));
-        this.mainFrame.getContentPane().setBackground(new Color(87,72,82));
-        /* --- */
-
-        /* Setup UI Container */
-        SetupStatusContainer();
-        SetupBoardContainer();
-        /* --- */
-
-        mainFrame.pack();
-        mainFrame.setVisible(true);
+        this.setupPlaygroundUI();
 
         /* Initialize Player & Bot */
 //        this.player_turn = "x";
@@ -91,11 +70,14 @@ public class Playground {
 
         // ===> Initialize Game Status to JSON file
         this.gameStatus = new GameStatus(difficulty,this);
+        this.gameStatus.saveGameStatus();
         // <===
 
 
         this.player_turn_label.setText("- Player: "+player_turn.toUpperCase());
         this.bot = new Bot(difficulty,this);
+
+        showPlayground();
 
         if (!current_turn.equalsIgnoreCase(player_turn)) {
             this.bot.play();
@@ -103,6 +85,32 @@ public class Playground {
         /* --- */
         
     }
+
+    // For continue Game
+    public Playground(JFrame mainFrame){
+        this.mainFrame = mainFrame;
+        this.setupPlaygroundUI();
+
+        this.gameStatus = new GameStatus(this);
+
+        this.player_turn_label.setText("- Player: "+player_turn.toUpperCase());
+        this.current_turn_label.setText("- Turn: " + this.current_turn.toUpperCase());
+
+
+        this.x_played_move_label.setText("  X: "+x_played_move_count);
+        this.o_played_move_label.setText("  O: "+o_played_move_count);
+
+        this.bot = new Bot(this.difficulty,this);
+
+        showPlayground();
+
+        if (!current_turn.equalsIgnoreCase(player_turn)) {
+            this.bot.play();
+        }
+
+    }
+
+
 
     public String getCurrentTurn(){
         return this.current_turn;
@@ -138,6 +146,35 @@ public class Playground {
 
 
     /* Setup UI */
+    public void setupPlaygroundUI(){
+        /* Reset `mainFrame` */
+        this.mainFrame.getContentPane().removeAll();
+        this.mainFrame.revalidate();
+        this.mainFrame.repaint();
+        /* --- */
+
+        /* Styling `mainFrame` */
+
+        this.mainFrame.setSize(width, height);
+        this.mainFrame.setLocationRelativeTo(null);
+        this.mainFrame.setResizable(false);
+        this.mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.mainFrame.setLayout(new BoxLayout(mainFrame.getContentPane(), BoxLayout.X_AXIS));
+        this.mainFrame.getContentPane().setBackground(new Color(87,72,82));
+        /* --- */
+
+        /* Setup UI Container */
+        SetupStatusContainer();
+        SetupBoardContainer();
+        /* --- */
+    }
+
+
+    public void showPlayground(){
+        this.mainFrame.pack();
+        this.mainFrame.setVisible(true);
+    }
+
     private void SetupStatusContainer() {
         JPanel statusContainer = new JPanel();
         statusContainer.setOpaque(false);

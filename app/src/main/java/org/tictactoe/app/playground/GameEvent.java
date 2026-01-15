@@ -50,7 +50,7 @@ public class GameEvent {
         }
 
         // Boundary check (Base on grid size)
-        int boardSize = Playground.boardSize;
+        int boardSize = this.playground.boardSize;
         if (new_r >= boardSize || new_c >= boardSize || new_r < 0 || new_c < 0) {
             return null;
         }

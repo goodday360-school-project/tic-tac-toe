@@ -1,12 +1,24 @@
 package org.tictactoe.app.menu;
 
-import org.tictactoe.app.utils.Utils;
-import org.tictactoe.app.playground.Playground;
-
-import java.awt.*;
-import java.util.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
 import java.net.URL;
+import java.util.Objects;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import org.tictactoe.app.playground.Playground;
+import org.tictactoe.app.utils.Utils;
 
 
 public class Menu {
@@ -21,9 +33,9 @@ public class Menu {
 
     public JPanel createContentPane() {
         // Add screens to the card layout with unique names
-//        cardPanel.add(createMenuPanel("SIGNIN"), "SIGNIN");
         cardPanel.add(createMenuPanel("START"), "START");
         cardPanel.add(createMenuPanel("DIFFICULTY"), "DIFFICULTY");
+        cardPanel.add(createMenuPanel("STATS"), "STATS");
 
         // Background Wrapper
         JPanel mainWrapper = new JPanel(new BorderLayout());
@@ -42,6 +54,8 @@ public class Menu {
     }
 
     private JPanel createMenuPanel(String type) {
+
+
         JPanel panel = new JPanel();
         panel.setOpaque(false);
         ImageIcon borderOriginal = new ImageIcon(border_IMAGE_FILE);
@@ -51,31 +65,50 @@ public class Menu {
         JLabel borderLabel = new JLabel(icon);
         borderLabel.setLayout(new GridBagLayout());
 
-        String titleText = type.equals("DIFFICULTY") ? "Difficulty" : "Tic Tac Toe";
+        String titleText = type;
+        if(type.equals("START")){
+            titleText="tic tac toe";
+        }
         JLabel title = new JLabel(titleText);
         title.setFont(Utils.getFont(40f));
         title.setForeground(Color.WHITE);
         borderLabel.add(title, insert(50, 0, 0, 0, GridBagConstraints.NORTH, 1, 0));
 
-        if (type.equals("SIGNIN")) {
-            borderLabel.add(createStyledButton("Login", e -> cardLayout.show(cardPanel, "START")), insert(0, 0, -10, 0, GridBagConstraints.SOUTH, 1, 1));
-            borderLabel.add(createStyledButton("Sign Up", null), insert(0, 0, -10, 0, GridBagConstraints.SOUTH, 1, 2));
-            borderLabel.add(createStyledButton("Quit", e -> System.exit(0)),
-                    insert(0, 0, 50, 0, GridBagConstraints.SOUTH, 1, 3));
-        } else if (type.equals("START")) {
-            borderLabel.add(createStyledButton("New Game", e -> cardLayout.show(cardPanel, "DIFFICULTY")), insert(0, 0, 0, 0, GridBagConstraints.SOUTH, 1, 1));
-            borderLabel.add(createStyledButton("Continue", e -> cardLayout.show(cardPanel, "CONTINUE")), insert(0, 0, 125, 0, GridBagConstraints.SOUTH, 1, 2));
-//            borderLabel.add(createStyledButton("Sign Out", e -> cardLayout.show(cardPanel, "SIGNIN")), insert(0, 0, 50, 0, GridBagConstraints.SOUTH, 1, 3));
+        if (type.equals("START")) {
+
+            borderLabel.add(createStyledButton("New Game", e -> cardLayout.show(cardPanel, "DIFFICULTY")), insert(0, 0, -20, 0, GridBagConstraints.SOUTH, 1, 1));
+            borderLabel.add(createStyledButton("Continue", e -> new Playground(mainFrame)), insert(0, 0, -20, 0, GridBagConstraints.SOUTH, 1, 2));
+            borderLabel.add(createStyledButton("stats", e -> cardLayout.show(cardPanel, "STATS")), insert(0, 0, 100, 0, GridBagConstraints.SOUTH, 1, 3));
         } else if (type.equals("DIFFICULTY")) {
             borderLabel.add(createStyledButton("Easy", e-> new Playground(mainFrame, 0)), insert(0, 0, -10, 0, GridBagConstraints.SOUTH, 1, 1));
             borderLabel.add(createStyledButton("Normal", e-> new Playground(mainFrame, 1)), insert(0, 0, -10, 0, GridBagConstraints.SOUTH, 1, 2));
             borderLabel.add(createStyledButton("Hard", e-> new Playground(mainFrame, 2)), insert(0, 0, -10, 0, GridBagConstraints.SOUTH, 1, 3));
+            borderLabel.add(createStyledButton("Back", e -> cardLayout.show(cardPanel, "START")), insert(0, 0, 50, 0, GridBagConstraints.SOUTH, 1, 4));
+        } else if (type.equals("STATS")) {
+
+            JLabel winLabel = new JLabel("Wins: 0");
+            winLabel.setFont(Utils.getFont(20f));
+            winLabel.setForeground(Color.WHITE);
+            borderLabel.add(winLabel, insert(0, 20, 0, 0, GridBagConstraints.WEST, 1, 1));
+
+            JLabel lossLabel = new JLabel("Losses: 0");
+            lossLabel.setFont(Utils.getFont(20f));
+            lossLabel.setForeground(Color.WHITE);
+            borderLabel.add(lossLabel, insert(0, 20, 0, 0, GridBagConstraints.WEST, 1, 2));
+
+            JLabel drawlabal = new JLabel("draw: 0");
+            drawlabal.setFont(Utils.getFont(20f));
+            drawlabal.setForeground(Color.WHITE);
+            borderLabel.add(drawlabal, insert(0, 20, 0, 0, GridBagConstraints.WEST, 1, 3));
+
             borderLabel.add(createStyledButton("Back", e -> cardLayout.show(cardPanel, "START")), insert(0, 0, 50, 0, GridBagConstraints.SOUTH, 1, 4));
         }
 
         panel.add(borderLabel);
         return panel;
     }
+
+
 
     public JButton createStyledButton(String text, java.awt.event.ActionListener action) {
         JButton button = new JButton(text);
