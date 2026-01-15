@@ -55,6 +55,8 @@ public class HardBot {
                 int[] max_position_to_play = new int[2];
                 int max_score = Integer.MIN_VALUE;
                 int min_score = Integer.MAX_VALUE;
+                boolean has_strong_min_score = false;
+                boolean has_strong_max_score = false;
 
                 for (Future<HardBotTaskResult> future : results) {
                     HardBotTaskResult result = future.get();
@@ -62,14 +64,17 @@ public class HardBot {
                         continue;
                     }
                     // ===> Pick Lowest Min and Highest Max Score Position
-                    if ((result.min_score < min_score) || (result.is_strong_min_score)) {
+                    if (((result.min_score < min_score) || (result.is_strong_min_score)) && !has_strong_min_score) {
                         min_score = result.min_score;
                         min_position_to_play = new int[]{result.r, result.c};
+
+                        if (result.is_strong_min_score) has_strong_min_score = true;
                     }
 
-                    if ((result.max_score > max_score) || (result.is_strong_max_score)) {
+                    if (((result.max_score > max_score) || (result.is_strong_max_score)) && !has_strong_max_score) {
                         max_score = result.max_score;
                         max_position_to_play = new int[]{result.r, result.c};
+                        if (result.is_strong_min_score) has_strong_max_score = true;
                     }
                     // <===
                     System.out.println("Min: " + result.min_score + " Max: " + result.max_score + " Pos: " + result.r + " " + result.c);
@@ -131,7 +136,7 @@ public class HardBot {
             int min_outlier_predict_score = 0;
             int max_outlier_predict_score = 0;
 
-            /* Check Matched Direction In Pair */
+            // ===> Check Matched Direction In Pair
             //      NW  N  NE
             //      W - | - E
             //      SW  S  SE
@@ -275,7 +280,48 @@ public class HardBot {
                     }
                 }
             }
+            // <===
 
+            // ===> Check min_score for another special around position
+            //     -
+            //     -
+            // - -   - -
+            //     -
+            //     -
+
+            String[] all_directions = {"n","s","e", "w", "ne", "sw", "nw", "se"};
+            int count_special_position = 0;
+            for (String direction: all_directions) {
+                int[] last_checking_position = {r,c};
+                int direction_min_score = 0;
+                while (true) {
+                    if (direction_min_score == -2) {
+                        count_special_position++;
+                        break;
+                    }
+
+                    int[] next_position = this.playground.gameEvent.getNextPosition(last_checking_position[0], last_checking_position[1], direction);
+                    last_checking_position = next_position;
+
+                    if (next_position == null) {
+                        break;
+                    }
+
+                    String next_position_turn = board[next_position[0]][next_position[1]].getText().trim();
+
+                    if (next_position_turn.equalsIgnoreCase(player_turn)) {
+                        direction_min_score--;
+                    }else{
+                        break;
+                    }
+                }
+            }
+
+            if (count_special_position >= 2){
+                min_score = -4;
+                is_strong_min_score = true;
+            }
+            // <===
 
             // ===> Current Position Score Adjustment
             if (min_score < 0){
