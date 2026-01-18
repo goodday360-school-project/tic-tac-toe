@@ -1,9 +1,12 @@
 package org.tictactoe.app.playground;
 
 
+import org.tictactoe.app.utils.ManageGameStats;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class GameEvent {
     private final Playground playground;
@@ -66,7 +69,7 @@ public class GameEvent {
             return;
         }
 
-        if (!this.playground.getCurrentTurn().equalsIgnoreCase(turn) && (this.playground.difficulty > 0)){
+        if (!this.playground.getCurrentTurn().equalsIgnoreCase(turn) && (this.playground.difficulty >= 0)){
             return;
         }
 
@@ -85,14 +88,15 @@ public class GameEvent {
         // <===
 
         this.checkGameResult(r, c);
+        this.playground.switchCurrentTurn();
         this.playground.gameStatus.updateGameStatus(r, c, turn);
+
         if (this.playground.gameEnd) {
             return;
         }
-        this.playground.switchCurrentTurn();
         System.out.println("Turn: " + this.playground.getCurrentTurn());
 
-        if (this.playground.difficulty > 0) {
+        if (this.playground.difficulty >= 0) {
             if (!this.playground.getCurrentTurn().equals(this.playground.getPlayerTurn())) {
                 this.playground.isWorking = true;
 
@@ -109,7 +113,7 @@ public class GameEvent {
         String current_position_turn = board[r][c].getText().trim();
 
 
-        /* Check Matched Direction */
+        /* Check Matched Direction to find Win or Lose */
         //      NW  N  NE
         //      W - | - E
         //      SW  S  SE
@@ -162,15 +166,36 @@ public class GameEvent {
                     board[r][c].setBackground(new Color(255,0,0));
                     board[position[0]][position[1]].setBackground(new Color(255,0,0));
                 }
-                this.playground.setEndGame(current_position_turn);
-
-                break;
+                this.playground.setEndGame(current_position_turn, 1);
+                if (current_position_turn.equalsIgnoreCase(this.playground.getPlayerTurn())) {
+                    ManageGameStats.GameStats game_stats = ManageGameStats.getGameStats();
+                    game_stats.wins++;
+                    ManageGameStats.saveGameStats(game_stats);
+                }
+                return;
             }
 
         }
         System.out.println("====");
 
         /* --- */
+
+        /* Check for Draw */
+        int boardSize = playground.boardSize;
+        boolean available_move = false;
+        for (int current_r = 0; current_r < boardSize; current_r++){
+            for (int current_c = 0; current_c < boardSize; current_c++) {
+                if (board[current_r][current_c].getText().trim().equalsIgnoreCase("")){
+                    available_move = true;
+                    break;
+                }
+            }
+        }
+        if (!available_move){
+            this.playground.setEndGame(current_position_turn, 0);
+        }
+        /* --- */
+
 
 
     }

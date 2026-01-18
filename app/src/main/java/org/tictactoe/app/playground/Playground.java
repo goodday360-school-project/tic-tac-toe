@@ -59,6 +59,7 @@ public class Playground {
     private final JLabel player_turn_label = new JLabel("- Player: ");
 
     private JLabel winner_label = new JLabel("");
+    private JLabel endgame_feedback_label = new JLabel("");
 
     /* Played Move */
     public int x_played_move_count = 0;
@@ -78,7 +79,7 @@ public class Playground {
         /* Initialize Player & Bot */
 
 
-        if (this.difficulty > 0) {
+        if (this.difficulty >= 0) {
             this.player_turn = Utils.shuffleArray(new String[]{"x","o"})[0];
             // ===> Initialize Game Status to JSON file
             this.gameStatus = new GameStatus(difficulty, this);
@@ -127,7 +128,7 @@ public class Playground {
 
         showPlayground();
 
-        if (this.difficulty > 0){
+        if (this.difficulty >= 0){
             this.bot = new Bot(this.difficulty,this);
             if (!current_turn.equalsIgnoreCase(player_turn)) {
                 this.bot.play();
@@ -150,6 +151,9 @@ public class Playground {
 
 
     public void switchCurrentTurn() {
+        if (this.gameEnd){
+            return;
+        }
         System.out.println("Switching Turn From: " + this.current_turn);
         if (this.current_turn.trim().equalsIgnoreCase("x")){
             this.current_turn = "o";
@@ -404,7 +408,6 @@ public class Playground {
 
     /* Setup EndGame Layer UI */
     public void SetupEndGameContainer(){
-        System.out.println("HEre");
         this.endgamePanel = new JPanel();
         this.endgamePanel.setBackground(null);
         this.endgamePanel.setOpaque(false);
@@ -445,14 +448,13 @@ public class Playground {
             winner_label.setVerticalAlignment(SwingConstants.CENTER);
             panel.add(winner_label);
 
-            JLabel text_2 = new JLabel("WIN THE GAME");
-            text_2.setForeground(Color.GREEN);
-            text_2.setMaximumSize(new Dimension(panel_width, 25));
-            text_2.setFont(Utils.getFont(50));
-            text_2.setMaximumSize(new Dimension(panel_width - 60, 20));
-            text_2.setHorizontalAlignment(SwingConstants.CENTER);
-            text_2.setVerticalAlignment(SwingConstants.CENTER);
-            panel.add(text_2);
+            endgame_feedback_label.setForeground(Color.GREEN);
+
+            endgame_feedback_label.setFont(Utils.getFont(50));
+            endgame_feedback_label.setMaximumSize(new Dimension(panel_width - 60, 20));
+            endgame_feedback_label.setHorizontalAlignment(SwingConstants.CENTER);
+            endgame_feedback_label.setVerticalAlignment(SwingConstants.CENTER);
+            panel.add(endgame_feedback_label);
 
         }// < ===
 
@@ -477,13 +479,22 @@ public class Playground {
         layeredPane.add(this.endgamePanel, JLayeredPane.PALETTE_LAYER);
     }
 
-    public void setEndGame(String winner){
-        winner_label.setText(winner);
-        if (winner.equalsIgnoreCase("x")){
-            winner_label.setForeground(new Color(254,137,9));
+    public void setEndGame(String winner, int state){
+        if (state == 1) {
+            winner_label.setText(winner);
+            if (winner.equalsIgnoreCase("x")){
+                winner_label.setForeground(new Color(254,137,9));
+            }else{
+                winner_label.setForeground(new Color(0,220,255));
+            }
+            endgame_feedback_label.setMaximumSize(new Dimension(450, 25));
+            endgame_feedback_label.setText("WIN THE GAME");
         }else{
-            winner_label.setForeground(new Color(0,220,255));
+            winner_label.setVisible(false);
+            endgame_feedback_label.setMaximumSize(new Dimension(450, 150));
+            endgame_feedback_label.setText("GAME DRAW");
         }
+
         this.endgamePanel.setVisible(true);
     }
 

@@ -15,9 +15,13 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+
 import org.tictactoe.app.playground.GameStatus;
 import org.tictactoe.app.playground.Playground;
 import org.tictactoe.app.utils.Utils;
+import org.tictactoe.app.utils.ManageGameStats;
+
 
 
 public class Menu {
@@ -78,6 +82,7 @@ public class Menu {
 
         if (type.equals("START")) {
 
+
             borderLabel.add(createStyledButton("New Game", e -> cardLayout.show(cardPanel, "MODE")), insert(0, 0, -20, 0, GridBagConstraints.SOUTH, 1, 1));
 
             if (GameStatus.is_can_continue()){
@@ -91,18 +96,19 @@ public class Menu {
             borderLabel.add(createStyledButton("Hard", e-> new Playground(mainFrame, 2)), insert(0, 0, -10, 0, GridBagConstraints.SOUTH, 1, 3));
             borderLabel.add(createStyledButton("Back", e -> cardLayout.show(cardPanel, "MODE")), insert(0, 0, 50, 0, GridBagConstraints.SOUTH, 1, 4));
         } else if (type.equals("STATS")) {
+            ManageGameStats.GameStats game_stats = ManageGameStats.getGameStats();
 
-            JLabel winLabel = new JLabel("Wins: 0");
+            JLabel winLabel = new JLabel("Wins: "+ game_stats.wins);
             winLabel.setFont(Utils.getFont(20f));
             winLabel.setForeground(Color.WHITE);
             borderLabel.add(winLabel, insert(0, 20, 0, 0, GridBagConstraints.WEST, 1, 1));
 
-            JLabel lossLabel = new JLabel("Losses: 0");
+            JLabel lossLabel = new JLabel("Losses: "+ game_stats.losses);
             lossLabel.setFont(Utils.getFont(20f));
             lossLabel.setForeground(Color.WHITE);
             borderLabel.add(lossLabel, insert(0, 20, 0, 0, GridBagConstraints.WEST, 1, 2));
 
-            JLabel drawlabal = new JLabel("draw: 0");
+            JLabel drawlabal = new JLabel("draw: "+ game_stats.draws);
             drawlabal.setFont(Utils.getFont(20f));
             drawlabal.setForeground(Color.WHITE);
             borderLabel.add(drawlabal, insert(0, 20, 0, 0, GridBagConstraints.WEST, 1, 3));
