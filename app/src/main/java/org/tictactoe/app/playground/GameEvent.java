@@ -111,7 +111,7 @@ public class GameEvent {
         System.out.println("It run with RC: "+r+c);
         JButton[][] board = playground.board;
         String current_position_turn = board[r][c].getText().trim();
-
+        ManageGameStats.GameStats game_stats = ManageGameStats.getGameStats();
 
         /* Check Matched Direction to find Win or Lose */
         //      NW  N  NE
@@ -167,9 +167,13 @@ public class GameEvent {
                     board[position[0]][position[1]].setBackground(new Color(255,0,0));
                 }
                 this.playground.setEndGame(current_position_turn, 1);
-                if (current_position_turn.equalsIgnoreCase(this.playground.getPlayerTurn())) {
-                    ManageGameStats.GameStats game_stats = ManageGameStats.getGameStats();
-                    game_stats.wins++;
+
+                if (this.playground.difficulty >= 0){
+                    if (current_position_turn.equalsIgnoreCase(this.playground.getPlayerTurn())) {
+                        game_stats.wins++;
+                    }else{
+                        game_stats.losses++;
+                    }
                     ManageGameStats.saveGameStats(game_stats);
                 }
                 return;
@@ -193,6 +197,11 @@ public class GameEvent {
         }
         if (!available_move){
             this.playground.setEndGame(current_position_turn, 0);
+
+            if (this.playground.difficulty >= 0){
+                game_stats.draws++;
+                ManageGameStats.saveGameStats(game_stats);
+            }
         }
         /* --- */
 

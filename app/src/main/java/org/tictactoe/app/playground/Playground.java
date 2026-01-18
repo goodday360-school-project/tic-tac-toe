@@ -448,7 +448,7 @@ public class Playground {
             winner_label.setVerticalAlignment(SwingConstants.CENTER);
             panel.add(winner_label);
 
-            endgame_feedback_label.setForeground(Color.GREEN);
+            endgame_feedback_label.setForeground(new Color(128, 0, 128));
 
             endgame_feedback_label.setFont(Utils.getFont(50));
             endgame_feedback_label.setMaximumSize(new Dimension(panel_width - 60, 20));
