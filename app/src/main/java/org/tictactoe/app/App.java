@@ -16,8 +16,7 @@ public class App {
     public static void main(String[] args) {
 //        Playground playground = new Playground(mainFrame);
 //        Playground playground = new Playground(mainFrame, 1);
-//        Playground playground = new Playground(mainFrame, -1);
-            Menu menu = new Menu(mainFrame);
-
+        Playground playground = new Playground(mainFrame, -1);
+//            Menu menu = new Menu(mainFrame);
     }
 }

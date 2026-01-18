@@ -85,18 +85,14 @@ public class GameEvent {
         // <===
 
         this.checkGameResult(r, c);
-
+        this.playground.gameStatus.updateGameStatus(r, c, turn);
         if (this.playground.gameEnd) {
             return;
         }
-
-
         this.playground.switchCurrentTurn();
         System.out.println("Turn: " + this.playground.getCurrentTurn());
 
         if (this.playground.difficulty > 0) {
-            this.playground.gameStatus.updateGameStatus(r, c, turn);
-
             if (!this.playground.getCurrentTurn().equals(this.playground.getPlayerTurn())) {
                 this.playground.isWorking = true;
 
@@ -166,6 +162,7 @@ public class GameEvent {
                     board[r][c].setBackground(new Color(255,0,0));
                     board[position[0]][position[1]].setBackground(new Color(255,0,0));
                 }
+                this.playground.setEndGame(current_position_turn);
 
                 break;
             }
