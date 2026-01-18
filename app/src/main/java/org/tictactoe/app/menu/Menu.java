@@ -10,13 +10,11 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.net.URL;
 import java.util.Objects;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
 import org.tictactoe.app.playground.GameStatus;
 import org.tictactoe.app.playground.Playground;
 import org.tictactoe.app.utils.Utils;
@@ -37,6 +35,7 @@ public class Menu {
         cardPanel.add(createMenuPanel("START"), "START");
         cardPanel.add(createMenuPanel("DIFFICULTY"), "DIFFICULTY");
         cardPanel.add(createMenuPanel("STATS"), "STATS");
+        cardPanel.add(createMenuPanel("MODE"), "MODE");
 
         // Background Wrapper
         JPanel mainWrapper = new JPanel(new BorderLayout());
@@ -69,7 +68,9 @@ public class Menu {
         String titleText = type;
         if(type.equals("START")){
             titleText="tic tac toe";
-        }
+        }else if(type.equals("MODE")){
+            titleText="Mode";
+        };
         JLabel title = new JLabel(titleText);
         title.setFont(Utils.getFont(40f));
         title.setForeground(Color.WHITE);
@@ -77,7 +78,7 @@ public class Menu {
 
         if (type.equals("START")) {
 
-            borderLabel.add(createStyledButton("New Game", e -> cardLayout.show(cardPanel, "DIFFICULTY")), insert(0, 0, -20, 0, GridBagConstraints.SOUTH, 1, 1));
+            borderLabel.add(createStyledButton("New Game", e -> cardLayout.show(cardPanel, "MODE")), insert(0, 0, -20, 0, GridBagConstraints.SOUTH, 1, 1));
 
             if (GameStatus.is_can_continue()){
                 borderLabel.add(createStyledButton("Continue", e -> new Playground(mainFrame)), insert(0, 0, -20, 0, GridBagConstraints.SOUTH, 1, 2));
@@ -88,7 +89,7 @@ public class Menu {
             borderLabel.add(createStyledButton("Easy", e-> new Playground(mainFrame, 0)), insert(0, 0, -10, 0, GridBagConstraints.SOUTH, 1, 1));
             borderLabel.add(createStyledButton("Normal", e-> new Playground(mainFrame, 1)), insert(0, 0, -10, 0, GridBagConstraints.SOUTH, 1, 2));
             borderLabel.add(createStyledButton("Hard", e-> new Playground(mainFrame, 2)), insert(0, 0, -10, 0, GridBagConstraints.SOUTH, 1, 3));
-            borderLabel.add(createStyledButton("Back", e -> cardLayout.show(cardPanel, "START")), insert(0, 0, 50, 0, GridBagConstraints.SOUTH, 1, 4));
+            borderLabel.add(createStyledButton("Back", e -> cardLayout.show(cardPanel, "MODE")), insert(0, 0, 50, 0, GridBagConstraints.SOUTH, 1, 4));
         } else if (type.equals("STATS")) {
 
             JLabel winLabel = new JLabel("Wins: 0");
@@ -107,6 +108,16 @@ public class Menu {
             borderLabel.add(drawlabal, insert(0, 20, 0, 0, GridBagConstraints.WEST, 1, 3));
 
             borderLabel.add(createStyledButton("Back", e -> cardLayout.show(cardPanel, "START")), insert(0, 0, 50, 0, GridBagConstraints.SOUTH, 1, 4));
+        }else if (type.equals("MODE")) {
+
+            JButton btn_1 = createStyledButton("Player vs Player", e-> new Playground(mainFrame, -1));
+            setButtonSize(btn_1, 225, 30);
+            borderLabel.add(btn_1, insert(0, 0, -10, 0, GridBagConstraints.SOUTH, 1, 1));
+
+            JButton btn_2 = createStyledButton("Player vs Bot", e -> cardLayout.show(cardPanel, "DIFFICULTY"));
+            setButtonSize(btn_2, 225, 30);
+            borderLabel.add(btn_2, insert(0, 0, 50, 0, GridBagConstraints.SOUTH, 1, 2));
+            borderLabel.add(createStyledButton("Back", e -> cardLayout.show(cardPanel, "START")), insert(0, 0, 50, 0, GridBagConstraints.SOUTH, 1, 4));
         }
 
         panel.add(borderLabel);
@@ -114,6 +125,12 @@ public class Menu {
     }
 
 
+    public void setButtonSize(JButton button, int width, int height){
+        ImageIcon buttonOriginal = new ImageIcon(BUTTON_IMAGE_FILE);
+        Image buttonScaled = buttonOriginal.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        ImageIcon icon = new ImageIcon(buttonScaled);
+        button.setIcon(icon);
+    }
 
     public JButton createStyledButton(String text, java.awt.event.ActionListener action) {
         JButton button = new JButton(text);
@@ -144,6 +161,11 @@ public class Menu {
 
     public Menu(JFrame frame) {
         this.mainFrame = frame;
+        /* Reset `mainFrame` */
+        this.mainFrame.getContentPane().removeAll();
+        this.mainFrame.revalidate();
+        this.mainFrame.repaint();
+        /* --- */
         frame.setSize(800, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);

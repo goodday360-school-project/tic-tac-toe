@@ -66,7 +66,7 @@ public class GameEvent {
             return;
         }
 
-        if (!this.playground.getCurrentTurn().equalsIgnoreCase(turn)){
+        if (!this.playground.getCurrentTurn().equalsIgnoreCase(turn) && (this.playground.difficulty > 0)){
             return;
         }
 
@@ -85,17 +85,25 @@ public class GameEvent {
         // <===
 
         this.checkGameResult(r, c);
+
+        if (this.playground.gameEnd) {
+            return;
+        }
+
+
         this.playground.switchCurrentTurn();
         System.out.println("Turn: " + this.playground.getCurrentTurn());
 
-        this.playground.gameStatus.updateGameStatus(r, c, turn);
+        if (this.playground.difficulty > 0) {
+            this.playground.gameStatus.updateGameStatus(r, c, turn);
 
-        if (!this.playground.getCurrentTurn().equals(this.playground.getPlayerTurn())){
-            this.playground.isWorking = true;
+            if (!this.playground.getCurrentTurn().equals(this.playground.getPlayerTurn())) {
+                this.playground.isWorking = true;
 
-            // ===> Give Turn To Bot
-            this.playground.bot.play();
-            // <===
+                // ===> Give Turn To Bot
+                this.playground.bot.play();
+                // <===
+            }
         }
     }
 

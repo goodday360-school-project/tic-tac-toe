@@ -74,19 +74,19 @@ public class HardBot {
                     if (((result.max_score > max_score) || (result.is_strong_max_score)) && !has_strong_max_score) {
                         max_score = result.max_score;
                         max_position_to_play = new int[]{result.r, result.c};
-                        if (result.is_strong_min_score) has_strong_max_score = true;
+                        if (result.is_strong_max_score) has_strong_max_score = true;
                     }
                     // <===
-                    System.out.println("Min: " + result.min_score + " Max: " + result.max_score + " Pos: " + result.r + " " + result.c);
+                    System.out.println("Min: " + result.min_score + " Max: " + result.max_score + " Pos: " + result.r + " " + result.c + " Strong: " + has_strong_min_score + " " + has_strong_max_score);
                 }
                 System.out.println("Picked-> Min: " + min_score + " Max: " + max_score);
                 System.out.println("Picked-> Min Pos: " + min_position_to_play[0] + " " + min_position_to_play[1]);
                 System.out.println("Picked-> Max Pos: " + max_position_to_play[0] + " " + max_position_to_play[1]);
 
                 // ===> Calculate to choose position between Min or Max to play.
-                if (max_score >= this.playground.maxMatchToWin) {
+                if (has_strong_max_score || (max_score >= this.playground.maxMatchToWin && !has_strong_min_score)) {
                     play_position = max_position_to_play;
-                } else if (min_score <= -this.playground.maxMatchToWin) {
+                } else if ((min_score <= -this.playground.maxMatchToWin) || has_strong_min_score) {
                     play_position = min_position_to_play;
                 } else if (max_score > 0) {
                     play_position = max_position_to_play;
@@ -207,16 +207,7 @@ public class HardBot {
                                 current_checking_position_turn.equalsIgnoreCase(player_turn)
                         ){
                             System.out.println(next_position[0] + " "+ next_position[1] + " #2 here -> RC: " + r + " " + " " + c);
-                            // ===> Additional Check Step to find if the next after this next position is not the player
-                            // Because it's unnecessary move.
-                            int[] temp_next_position = this.playground.gameEvent.getNextPosition(next_position[0], next_position[1], direction);
-                            if (temp_next_position != null) {
-                                String temp_next_position_turn = board[temp_next_position[0]][temp_next_position[1]].getText().trim();
-
-                                if (min_outlier_predict_score == 0 && !temp_next_position_turn.equalsIgnoreCase(player_turn)) {
-                                    min_outlier_predict_score--;
-                                }
-                            }
+                            min_outlier_predict_score--;
                             // <===
                             break;
                         }
@@ -240,6 +231,7 @@ public class HardBot {
                     is_strong_min_score = true;
                 }
 
+                System.out.println("sms: "+ sum_max_score + " rc: " + r + " " + c);
                 if (sum_max_score >= (this.playground.maxMatchToWin - 1)){
                     is_strong_max_score = true;
                 }
@@ -266,14 +258,17 @@ public class HardBot {
 
                         // ==> Calculate for additional min outlier predict score
                         if (paired_direction_min_score[direction_index] <= -(this.playground.maxMatchToWin-2)){
-                            System.out.printf("#1 RC: %d %d has xxx\n", r, c);
-                            if (opposite_position != null){
-                                String opposite_position_turn = board[opposite_position[0]][opposite_position[1]].getText().trim();
-                                if (opposite_position_turn.isEmpty()){
-                                    min_outlier_predict_score--;
+                            int[] last_check_position = last_paired_checking_position[direction_index];
+                            if (last_check_position != null) {
+                                System.out.printf("#1 RC: %d %d has xxx\n", r, c);
+                                if (opposite_position != null) {
+                                    String opposite_position_turn = board[opposite_position[0]][opposite_position[1]].getText().trim();
+                                    if (opposite_position_turn.isEmpty()) {
+                                        min_outlier_predict_score--;
+                                    }
+                                } else {
+                                    min_outlier_predict_score++;
                                 }
-                            }else{
-                                min_outlier_predict_score++;
                             }
                         }
                         // <===
@@ -306,7 +301,6 @@ public class HardBot {
                                 count_special_position++;
                             }
                         }
-
                         break;
                     }
 
@@ -329,7 +323,6 @@ public class HardBot {
 
             if (count_special_position >= 2){
                 min_score = -4;
-                is_strong_min_score = true;
             }
             // <===
 

@@ -39,7 +39,7 @@ public class Playground {
     public boolean isWorking = false;
     public boolean gameEnd = false;
 
-    public final Bot bot;
+    public Bot bot;
 
     private final JFrame mainFrame;
 
@@ -62,26 +62,35 @@ public class Playground {
     public Playground(JFrame mainFrame, int difficulty) {
 
         this.mainFrame = mainFrame;
+        this.difficulty = difficulty;
         this.setupPlaygroundUI();
 
         /* Initialize Player & Bot */
-//        this.player_turn = "x";
-        this.player_turn = Utils.shuffleArray(new String[]{"x","o"})[0];
-
-        // ===> Initialize Game Status to JSON file
-        this.gameStatus = new GameStatus(difficulty,this);
-        this.gameStatus.saveGameStatus();
-        // <===
 
 
-        this.player_turn_label.setText("- Player: "+player_turn.toUpperCase());
-        this.bot = new Bot(difficulty,this);
+        if (this.difficulty > 0) {
+            this.player_turn = Utils.shuffleArray(new String[]{"x","o"})[0];
+
+            // ===> Initialize Game Status to JSON file
+            this.gameStatus = new GameStatus(difficulty, this);
+            this.gameStatus.saveGameStatus();
+            // <===
+
+
+            this.bot = new Bot(difficulty, this);
+
+            if (!current_turn.equalsIgnoreCase(player_turn)) {
+                this.bot.play();
+            }
+        }else if (this.difficulty == -1){
+            this.player_turn = "x";
+        }
+
+        this.player_turn_label.setText("- Player: " + player_turn.toUpperCase());
 
         showPlayground();
 
-        if (!current_turn.equalsIgnoreCase(player_turn)) {
-            this.bot.play();
-        }
+
         /* --- */
         
     }
@@ -130,6 +139,11 @@ public class Playground {
             this.current_turn = "x";
         }
         this.current_turn_label.setText("- Turn: " + this.current_turn.toUpperCase());
+
+        if (difficulty == -1) {
+            this.player_turn = current_turn;
+            this.player_turn_label.setText("- Player: "+ this.player_turn.toUpperCase());
+        }
     }
 
 
@@ -334,6 +348,40 @@ public class Playground {
                 boardPanel.add(tile);
             }
         }
+    }
+
+    public void EndGameContainer(){
+
+
+//        String result="win";
+//
+//
+//
+//            JPanel mainpane = new JPanel();
+//            ImageIcon originalIcon = new ImageIcon(bgfile);
+//            Image scaledImage = originalIcon.getImage().getScaledInstance(500, 500, Image.SCALE_SMOOTH);
+//            ImageIcon bgIcon = new ImageIcon(scaledImage);
+//
+//            JLabel bgLabel = new JLabel(bgIcon);
+//            mainpane.add(bgLabel);
+//
+//            JPanel OXpic = new JPanel();
+//            ImageIcon originalIco = new ImageIcon(OXfile);
+//            Image scaledImag = originalIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+//            ImageIcon bgIco = new ImageIcon(scaledImag);
+//
+//            JLabel OXJLabel = new JLabel(bgIco);
+//
+//            JLabel data=new JLabel(result);
+//
+//            mainpane.add(OXpic,name.insert(10, 0, 0, 0, GridBagConstraints.CENTER, 1, 1));
+//            mainpane.add(data,name.insert(10, 0, 0, 0, GridBagConstraints.CENTER, 1, 2));
+//            mainpane.add(name.createStyledButton(result,e -> mainpane()),name.insert(10, 0, 0, 0, GridBagConstraints.CENTER, 1, 3));
+//            mainpane.add(name.createStyledButton(result,e -> mainpane()),name.insert(10, 0, 0, 0, GridBagConstraints.CENTER, 1, 3));
+
+
+
+
 
     }
 
