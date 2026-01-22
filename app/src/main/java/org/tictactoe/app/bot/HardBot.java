@@ -207,7 +207,9 @@ public class HardBot {
                                 current_checking_position_turn.equalsIgnoreCase(player_turn)
                         ){
                             System.out.println(next_position[0] + " "+ next_position[1] + " #2 here -> RC: " + r + " " + " " + c);
-                            min_outlier_predict_score--;
+                            if (min_outlier_predict_score == 0) {
+                                min_outlier_predict_score--;
+                            }
                             // <===
                             break;
                         }
