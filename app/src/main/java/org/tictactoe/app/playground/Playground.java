@@ -28,8 +28,8 @@ import org.tictactoe.app.menu.Menu;
 
 
 public class Playground {
-    URL BUTTON_IMAGE_FILE = Objects.requireNonNull(getClass().getResource("/ui/button.png"));
-    URL BORDER_BOX_FILE = Objects.requireNonNull(getClass().getResource("/ui/RectangleBox_96x96.png"));
+    private final URL BUTTON_IMAGE_FILE = Objects.requireNonNull(getClass().getResource("/ui/button.png"));
+    private final URL BORDER_BOX_FILE = Objects.requireNonNull(getClass().getResource("/ui/RectangleBox_96x96.png"));
 
     public GameEvent gameEvent = new GameEvent(this);
     public GameStatus gameStatus;
@@ -438,7 +438,7 @@ public class Playground {
         // <===
 
         {// ===> Add to Panel
-            winner_label.setText("X");
+            winner_label.setText("x");
             winner_label.setFont(Utils.getFont(150));
             winner_label.setMaximumSize(new Dimension(panel_width - 60, 200));
             winner_label.setForeground(Color.WHITE);

@@ -84,10 +84,10 @@ public class HardBot {
                 System.out.println("Picked-> Max Pos: " + max_position_to_play[0] + " " + max_position_to_play[1]);
 
                 // ===> Calculate to choose position between Min or Max to play.
-                if (has_strong_max_score || (max_score >= this.playground.maxMatchToWin && !has_strong_min_score)) {
-                    play_position = max_position_to_play;
-                } else if ((min_score <= -this.playground.maxMatchToWin) || has_strong_min_score) {
+                if (((min_score <= -this.playground.maxMatchToWin) || has_strong_min_score) && !has_strong_max_score) {
                     play_position = min_position_to_play;
+                } else if (has_strong_max_score || (max_score >= this.playground.maxMatchToWin)) {
+                    play_position = max_position_to_play;
                 } else if (max_score > 0) {
                     play_position = max_position_to_play;
                 } else {

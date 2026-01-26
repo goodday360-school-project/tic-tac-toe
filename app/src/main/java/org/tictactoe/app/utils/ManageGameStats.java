@@ -6,9 +6,6 @@ import java.io.File;
 import java.io.IOException;
 
 
-
-
-
 public class ManageGameStats {
     public static File FILE = new File(Utils.getJarDir(), "game_stats.json");
     private static final ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
